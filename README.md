@@ -12,7 +12,7 @@
 
 ```
                        ┌─────────────────────────────┐
-   浏览器  ── :8080 ──▶ │  palworld-panel (容器)       │
+   浏览器  ── :8000 ──▶ │  palworld-panel (容器)       │
                        │   FastAPI + 内置 Vue3 前端    │
                        │   ├─ 挂载 docker.sock ────────┼─▶ 启停/重启游戏容器
                        │   ├─ 调 REST API :8212 ───────┼─▶ 玩家/指标/存档/广播
@@ -24,13 +24,13 @@
                        │  palworld-server (容器)      │
    玩家 ── :8211/udp ──▶│   cm2network/steamcmd 轻量镜像│
                        │   entrypoint.sh 装/更新/配置  │
-                       │   REST :8212 / RCON :25575   │
+                       │   REST API :8212             │
                        │   本体+存档卷 ./data/palworld │
                        └─────────────────────────────┘
 ```
 
 > 游戏服务端本体不打进镜像，容器首次启动时由 `game/entrypoint.sh` 通过 steamcmd
-> 从 **Steam CDN**（国内可达）下载到 `./data/palworld`，并自动写好 REST API / RCON /
+> 从 **Steam CDN**（国内可达）下载到 `./data/palworld`，并自动写好 REST API /
 > 管理员密码等配置再启动。镜像本身仅约 200MB，更新只走 Steam 增量，无需重新拉 5GB 镜像。
 
 ## 🚀 部署（Linux + Docker）
@@ -54,7 +54,7 @@ docker compose up -d --build
 
 # 4. 访问
 #    游戏:  <服务器IP>:8211 (UDP)
-#    面板:  http://<服务器IP>:8080   用 PANEL_USERNAME / PANEL_PASSWORD 登录
+#    面板:  http://<服务器IP>:8000   用 PANEL_USERNAME / PANEL_PASSWORD 登录
 ```
 
 ### 需要科学上网拉取 Steam / 依赖时
@@ -81,7 +81,7 @@ SERVER_HTTP_PROXY=http://172.17.0.1:7890
 
 `game/server.env` 依据官方两份文档拆分:
 - **启动参数** [(arguments)](https://docs.palworldgame.com/settings-and-operation/arguments) — `PORT/PLAYERS/USE_PERF_THREADS/NUMBER_OF_WORKER_THREADS/PUBLIC_LOBBY/PUBLIC_IP/PUBLIC_PORT/LOG_FORMAT/EXTRA_ARGS`，由 `entrypoint.sh` 动态拼成 `PalServer.sh` 命令行。
-- **服务器设置** [(configuration)](https://docs.palworldgame.com/settings-and-operation/configuration) — `SERVER_NAME/ADMIN_PASSWORD/REST_API_PORT/RCON_PORT` 等写入 `PalWorldSettings.ini`。
+- **服务器设置** [(configuration)](https://docs.palworldgame.com/settings-and-operation/configuration) — `SERVER_NAME/ADMIN_PASSWORD/REST_API_PORT` 等写入 `PalWorldSettings.ini`。
 
 > 经验/掉落/死亡惩罚等大量**玩法平衡**项无需写在这里，启动后在面板「服务器设置」在线改即可。
 > `USE_PERF_THREADS` 默认 `false` —— 官方文档指出 v1.0+ 不设置该参数反而可能提升性能。
@@ -121,5 +121,5 @@ cd panel/frontend && npm install && npm run dev   # http://localhost:5173
 
 ## ⚠️ 安全提示
 
-- 面板挂载了 `docker.sock`，等同宿主机 root 权限，**务必**改掉默认密码，不要把 `:8080` 直接暴露公网；建议加反向代理 + HTTPS 或仅内网/VPN 访问。
+- 面板挂载了 `docker.sock`，等同宿主机 root 权限，**务必**改掉默认密码，不要把 `:8000` 直接暴露公网；建议加反向代理 + HTTPS 或仅内网/VPN 访问。
 - `ADMIN_PASSWORD` 同时是游戏管理员密码和 REST API 密码，请用强密码。

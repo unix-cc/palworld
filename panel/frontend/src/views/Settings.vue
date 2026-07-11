@@ -8,12 +8,68 @@
 
     <el-alert v-if="err" :title="err" type="error" :closable="false" style="margin-bottom: 12px" />
 
-    <el-table :data="rows" v-loading="loading" max-height="520">
-      <el-table-column prop="key" label="配置项" min-width="240" />
-      <el-table-column label="值" min-width="260">
-        <template #default="{ row }"><el-input v-model="row.value" size="small" /></template>
-      </el-table-column>
-    </el-table>
+    <el-alert
+      type="info" :closable="false" show-icon style="margin-bottom: 12px"
+      title="说明"
+      description="配置项按官方文档分为四类。带「由启动配置管理」标记的项由 game/server.env 在每次启动时写入, 此处修改会在下次重启被覆盖, 请到 server.env 修改。未在文档内出现的其它项归到「其它」页, 保留原样编辑。"
+    />
+
+    <el-tabs v-model="activeTab" v-loading="loading">
+      <el-tab-pane
+        v-for="cat in CATEGORIES" :key="cat.key"
+        :label="`${cat.title} (${grouped[cat.key]?.length || 0})`"
+        :name="cat.key"
+      >
+        <el-alert :title="cat.tip" type="info" :closable="false" style="margin-bottom: 12px" />
+        <el-form label-width="180px" label-position="left">
+          <el-form-item v-for="row in grouped[cat.key]" :key="row.key">
+            <template #label>
+              <span>{{ row.meta.label }}</span>
+              <el-tooltip v-if="row.meta.note" :content="row.meta.note" placement="top">
+                <el-tag size="small" type="danger" effect="plain" style="margin-left:4px">!</el-tag>
+              </el-tooltip>
+            </template>
+
+            <div style="width: 100%">
+              <div style="display:flex; align-items:center; gap:8px">
+                <!-- 布尔 -->
+                <el-switch v-if="row.meta.type === 'bool'" v-model="row.value" :disabled="row.meta.managed" />
+                <!-- 下拉 -->
+                <el-select v-else-if="row.meta.type === 'select'" v-model="row.value"
+                  :disabled="row.meta.managed" style="width: 240px">
+                  <el-option v-for="o in row.meta.options" :key="o" :label="o" :value="o" />
+                </el-select>
+                <!-- 整数 -->
+                <el-input-number v-else-if="row.meta.type === 'int'" v-model="row.value"
+                  :disabled="row.meta.managed" :step="1" :controls="true" style="width: 200px" />
+                <!-- 浮点 (倍率) -->
+                <el-input-number v-else-if="row.meta.type === 'float'" v-model="row.value"
+                  :disabled="row.meta.managed" :step="0.1" :precision="6" :controls="true" style="width: 200px" />
+                <!-- 文本 -->
+                <el-input v-else v-model="row.value" :disabled="row.meta.managed"
+                  size="default" style="max-width: 360px" />
+
+                <el-tag v-if="row.meta.managed" size="small" type="info">由启动配置管理</el-tag>
+                <span class="raw-key">{{ row.key }}</span>
+              </div>
+              <div class="desc">{{ row.meta.desc }}</div>
+            </div>
+          </el-form-item>
+
+          <el-empty v-if="!grouped[cat.key]?.length" description="该分类暂无配置项" />
+        </el-form>
+      </el-tab-pane>
+
+      <!-- 未识别的其它项: 原样文本编辑, 保证不丢配置 -->
+      <el-tab-pane :label="`其它 (${others.length})`" name="others" v-if="others.length">
+        <el-alert title="文档未收录 / 新版本新增的配置项, 原样以文本编辑。" type="info" :closable="false" style="margin-bottom: 12px" />
+        <el-form label-width="320px" label-position="left">
+          <el-form-item v-for="row in others" :key="row.key" :label="row.key">
+            <el-input v-model="row.value" size="default" style="max-width: 360px" />
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
+    </el-tabs>
 
     <div style="margin-top: 16px;">
       <el-button type="primary" @click="save" :loading="saving">保存配置</el-button>
@@ -23,28 +79,64 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
 import api from '../api'
+import { CATEGORIES, SCHEMA, toIniValue, fromIniValue } from '../settings_schema'
 
-const rows = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const err = ref('')
+const activeTab = ref(CATEGORIES[0].key)
+
+// 按分类分组的已知项 + 未识别项
+const grouped = reactive({})
+const others = ref([])
+CATEGORIES.forEach((c) => { grouped[c.key] = [] })
 
 async function load() {
   loading.value = true; err.value = ''
   try {
     const { data } = await api.get('/api/settings/ini')
-    rows.value = Object.entries(data).map(([key, value]) => ({ key, value }))
+    CATEGORIES.forEach((c) => { grouped[c.key] = [] })
+    others.value = []
+    for (const [key, raw] of Object.entries(data)) {
+      const meta = SCHEMA[key]
+      if (meta) {
+        grouped[meta.cat].push({ key, meta, value: fromIniValue(meta.type, raw) })
+      } else {
+        others.value.push({ key, value: String(raw).replace(/^"|"$/g, '') })
+      }
+    }
   } catch (e) { err.value = e.response?.data?.detail || '读取失败' }
   finally { loading.value = false }
 }
-async function doSave() {
+
+function collectUpdates() {
   const updates = {}
-  rows.value.forEach((r) => { updates[r.key] = r.value })
-  await api.put('/api/settings/ini', { updates })
+  // 已知项: 按类型转 ini 值; managed 项跳过(交给 server.env)
+  for (const c of CATEGORIES) {
+    for (const row of grouped[c.key]) {
+      if (row.meta.managed) continue
+      let v = toIniValue(row.meta.type, row.value)
+      // 文本/下拉/种子等含字符串的项, 写入时补引号 (bool/数值不加)
+      if (row.meta.type === 'text' || row.meta.type === 'select') {
+        v = `"${String(row.value).replace(/^"|"$/g, '')}"`
+      }
+      updates[row.key] = v
+    }
+  }
+  // 其它项: 原样(补引号以防含逗号)
+  for (const row of others.value) {
+    const s = String(row.value)
+    updates[row.key] = /[",]/.test(s) && !/^".*"$/.test(s) ? `"${s.replace(/"/g, '')}"` : s
+  }
+  return updates
+}
+
+async function doSave() {
+  await api.put('/api/settings/ini', { updates: collectUpdates() })
 }
 async function save() {
   saving.value = true
@@ -61,3 +153,8 @@ async function saveAndRestart() {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.desc { color: #909399; font-size: 12px; line-height: 1.5; margin-top: 2px; }
+.raw-key { color: #c0c4cc; font-size: 12px; font-family: monospace; }
+</style>

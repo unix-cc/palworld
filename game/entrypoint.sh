@@ -2,7 +2,7 @@
 # ============================================================================
 # 幻兽帕鲁服务端 启动脚本 (基于 cm2network/steamcmd)
 #   1. 通过 steamcmd 安装/更新 PalServer (Steam CDN, 国内可达)
-#   2. 首次生成 / 补齐 PalWorldSettings.ini, 开启 REST API + RCON
+#   2. 首次生成 / 补齐 PalWorldSettings.ini, 开启 REST API
 #   3. 前台启动 PalServer, 作为容器主进程
 # ============================================================================
 set -e
@@ -35,7 +35,6 @@ SERVER_DESCRIPTION="${SERVER_DESCRIPTION:-}"
 SERVER_PASSWORD="${SERVER_PASSWORD:-}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-changeme}"
 REST_API_PORT="${REST_API_PORT:-8212}"
-RCON_PORT="${RCON_PORT:-25575}"
 UPDATE_ON_BOOT="${UPDATE_ON_BOOT:-true}"
 
 CONFIG_DIR="${INSTALL_DIR}/Pal/Saved/Config/LinuxServer"
@@ -117,10 +116,9 @@ if [ ! -f "${CONFIG_FILE}" ]; then
 fi
 
 # 强制开启面板依赖的关键项 (每次启动都校准, 避免被改乱后连不上)
+# 注: 官方已用 REST API 取代 RCON, 本项目全程走 REST, 不再开启 RCON。
 set_opt "RESTAPIEnabled"  "True"
 set_opt "RESTAPIPort"     "${REST_API_PORT}"
-set_opt "RCONEnabled"     "True"
-set_opt "RCONPort"        "${RCON_PORT}"
 set_opt "AdminPassword"   "\"${ADMIN_PASSWORD}\""
 set_opt "PublicPort"      "${PORT}"
 set_opt "ServerName"      "\"${SERVER_NAME}\""
@@ -128,7 +126,7 @@ set_opt "ServerPlayerMaxNum" "${PLAYERS}"
 [ -n "${SERVER_DESCRIPTION}" ] && set_opt "ServerDescription" "\"${SERVER_DESCRIPTION}\""
 [ -n "${SERVER_PASSWORD}" ]    && set_opt "ServerPassword"    "\"${SERVER_PASSWORD}\""
 
-echo "    配置就绪: REST=${REST_API_PORT} RCON=${RCON_PORT} 端口=${PORT}"
+echo "    配置就绪: REST=${REST_API_PORT} 端口=${PORT}"
 
 # ---- 组装启动参数 (arguments) ----
 echo "==> [3/3] 启动 PalServer"

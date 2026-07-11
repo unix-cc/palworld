@@ -1,6 +1,6 @@
 # ============================================================================
 # 幻兽帕鲁服务器 + Web 管理面板  一键部署
-#   - palworld-server : 游戏服务端 (REST API + RCON + 自动更新/备份)
+#   - palworld-server : 游戏服务端 (REST API + 自动更新/备份)
 #   - palworld-panel  : Web 后台管理面板 (FastAPI + Vue3, 挂载 docker.sock)
 #
 # 部署:  cp .env.example .env  &&  修改密码  &&  docker compose up -d --build
@@ -15,10 +15,9 @@ services:
     stop_grace_period: 30s          # 关闭前留出存档时间
     entrypoint: ["/bin/bash", "/entrypoint.sh"]
     ports:
-      # 端口映射固定; 若改了 server.env 里的 PORT/REST_API_PORT/RCON_PORT, 需同步这里
+      # 端口映射固定; 若改了 server.env 里的 PORT/REST_API_PORT, 需同步这里
       - "8211:8211/udp"             # 游戏端口
       - "8212:8212/tcp"             # REST API 端口
-      - "25575:25575/tcp"           # RCON 端口
     # 全部服务端启动参数 / 配置 集中在 game/server.env, 见该文件说明
     env_file:
       - ./game/server.env
@@ -54,8 +53,8 @@ services:
     depends_on:
       - palworld-server
     ports:
-      - "${PANEL_PORT:-8080}:8000"
-    # 复用 server.env 以拿到 ADMIN_PASSWORD / RCON_PORT (REST/RCON 认证需要),
+      - "${PANEL_PORT:-8000}:8000"
+    # 复用 server.env 以拿到 ADMIN_PASSWORD (REST API 认证需要),
     # 与游戏容器共用同一份, 避免密码重复维护
     env_file:
       - ./game/server.env
@@ -68,7 +67,6 @@ services:
       # 目标游戏服务器 (compose 内网直连)
       PAL_CONTAINER_NAME: palworld-server
       PAL_REST_BASE: http://palworld-server:8212
-      PAL_RCON_HOST: palworld-server
       # 数据目录 (与游戏容器共享同一宿主机路径)
       PAL_DATA_DIR: /data/palworld
       PAL_BACKUP_DIR: /data/backup

@@ -23,11 +23,6 @@ class Settings(BaseSettings):
         default="",
         validation_alias=AliasChoices("PAL_ADMIN_PASSWORD", "ADMIN_PASSWORD"),
     )
-    pal_rcon_host: str = "palworld-server"
-    pal_rcon_port: int = Field(
-        default=25575,
-        validation_alias=AliasChoices("PAL_RCON_PORT", "RCON_PORT"),
-    )
 
     # --- 数据目录 (容器内路径) ---
     pal_data_dir: str = "/data/palworld"
