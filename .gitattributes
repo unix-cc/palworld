@@ -1,0 +1,28 @@
+# 统一换行符: 本项目部署在 Linux, 所有文本默认 LF, 防止 Windows 下 clone 变成 CRLF
+* text=auto eol=lf
+
+# Shell 脚本必须 LF (CRLF 会导致容器内 /bin/bash 执行失败)
+*.sh   text eol=lf
+*.py   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.js   text eol=lf
+*.vue  text eol=lf
+*.env  text eol=lf
+Dockerfile text eol=lf
+
+# Windows 脚本保持 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# 二进制文件不做换行转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.gz  binary
+*.zip binary
+*.tar binary
