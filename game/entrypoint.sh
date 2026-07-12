@@ -47,12 +47,15 @@ if [ ! -x "${STEAMCMD_DIR}/steamcmd.sh" ]; then
     mkdir -p "${STEAMCMD_DIR}"
     cp -a "${STEAMCMD_BUILTIN}/." "${STEAMCMD_DIR}/"
 fi
-# cm2network:root 镜像默认用户是 root, 但 steamcmd 目录及 steamcmd.sh 归属仍是 steam。
-# 官方说明: 以 root 跑 steamcmd.sh 需先 chown 或 su steam, 否则可能因所有权失败。
-# 我们全程以 root 运行(需写 /palworld 挂载 + 免装额外用户), 故把两处目录 chown 给 root,
-# 与官方 "use chown to change ownership" 推荐对齐, 消除所有权隐患。幂等, 每次启动都校准。
-chown -R root:root "${STEAMCMD_DIR}" 2>/dev/null || true
-chown root:root "${INSTALL_DIR}" 2>/dev/null || true
+# 关键: PalServer 本体(shipping 二进制)会硬性拒绝以 root 启动
+#   -> "Refusing to run with the root privileges."
+# 因此策略是: 以 root 完成 steamcmd 安装/更新 + 写挂载目录(root 无视权限最省事),
+# 最后降权到镜像自带的 steam 用户(uid 1000) 来 exec PalServer。
+# 这里先把两处持久化目录 chown 给 steam, 保证降权后游戏进程能读写存档/配置。
+# 幂等, 每次启动都校准 (root 安装产生的新文件在末尾还会再 chown 一次)。
+STEAM_USER="${STEAM_USER:-steam}"
+chown -R "${STEAM_USER}:${STEAM_USER}" "${STEAMCMD_DIR}" 2>/dev/null || true
+chown "${STEAM_USER}:${STEAM_USER}" "${INSTALL_DIR}" 2>/dev/null || true
 
 echo "==> [1/3] 安装 / 更新 PalServer (app ${APP_ID})"
 run_steamcmd() {
@@ -82,9 +85,13 @@ else
     echo "    已安装且关闭开机更新, 跳过。"
 fi
 
-# steamclient.so 软链 (PalServer 依赖)
-mkdir -p "${HOME}/.steam/sdk64"
-ln -sf "${STEAMCMD_DIR}/linux64/steamclient.so" "${HOME}/.steam/sdk64/steamclient.so" 2>/dev/null || true
+# steamclient.so 软链 (PalServer 依赖)。注意最终以 steam 用户启动,
+# 故软链要建在 steam 的 HOME 下(降权后按运行用户的 ~/.steam/sdk64 查找)。
+STEAM_HOME="$(getent passwd "${STEAM_USER}" | cut -d: -f6)"
+STEAM_HOME="${STEAM_HOME:-/home/steam}"
+mkdir -p "${STEAM_HOME}/.steam/sdk64"
+ln -sf "${STEAMCMD_DIR}/linux64/steamclient.so" "${STEAM_HOME}/.steam/sdk64/steamclient.so" 2>/dev/null || true
+chown -R "${STEAM_USER}:${STEAM_USER}" "${STEAM_HOME}/.steam" 2>/dev/null || true
 
 # ---- 配置文件处理 ----
 echo "==> [2/3] 处理 PalWorldSettings.ini"
@@ -146,4 +153,26 @@ fi
 [ -n "${EXTRA_ARGS}" ]  && ARGS+=( ${EXTRA_ARGS} )
 
 echo "    启动参数: ${ARGS[*]}"
-exec ./PalServer.sh "${ARGS[@]}"
+
+# ---- 降权启动 ----
+# PalServer 本体拒绝以 root 运行, 故切到 steam 用户再 exec。
+# 优先 gosu(cm2network 镜像自带), 依次兜底 setpriv / su, 都没有才裸跑(会失败但给出明确提示)。
+if [ "$(id -u)" -eq 0 ]; then
+    echo "    以 ${STEAM_USER} 用户降权启动 PalServer"
+    if command -v gosu >/dev/null 2>&1; then
+        exec gosu "${STEAM_USER}" ./PalServer.sh "${ARGS[@]}"
+    elif command -v setpriv >/dev/null 2>&1; then
+        SUID="$(id -u "${STEAM_USER}")"; SGID="$(id -g "${STEAM_USER}")"
+        exec setpriv --reuid "${SUID}" --regid "${SGID}" --init-groups ./PalServer.sh "${ARGS[@]}"
+    elif command -v su >/dev/null 2>&1; then
+        # su 需要把参数拼成一条命令串, 逐个 shell 转义防止空格/特殊字符
+        cmd="./PalServer.sh"; for a in "${ARGS[@]}"; do cmd="${cmd} $(printf '%q' "$a")"; done
+        exec su "${STEAM_USER}" -c "${cmd}"
+    else
+        echo "    !! 未找到 gosu/setpriv/su, 无法降权; PalServer 将拒绝以 root 运行。"
+        exec ./PalServer.sh "${ARGS[@]}"
+    fi
+else
+    # 容器已经以非 root 用户启动(compose 指定了 user), 直接跑
+    exec ./PalServer.sh "${ARGS[@]}"
+fi
