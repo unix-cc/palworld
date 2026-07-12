@@ -47,28 +47,6 @@ if [ ! -x "${STEAMCMD_DIR}/steamcmd.sh" ]; then
     mkdir -p "${STEAMCMD_DIR}"
     cp -a "${STEAMCMD_BUILTIN}/." "${STEAMCMD_DIR}/"
 fi
-# 关键: PalServer 本体(shipping 二进制)会硬性拒绝以 root 启动
-#   -> "Refusing to run with the root privileges."
-# 因此策略是: 以 root 完成 steamcmd 安装/更新 + 写挂载目录(root 无视权限最省事),
-# 最后降权到镜像自带的 steam 用户(uid 1000) 来 exec PalServer。
-# 这里先把两处持久化目录的属主校准给 steam, 保证降权后游戏进程能读写存档/配置。
-STEAM_USER="${STEAM_USER:-steam}"
-
-# fix_owner DIR : 自愈式 chown。仅当目录顶层属主不是 steam 时才整树递归 chown,
-#   避免每次启动都对几个 G 的存档全量递归(拖慢启动 + 无谓 IO)。
-#   典型场景: 早期误以 root 跑过, data 里遗留一批 root 属主文件, 首次切到本逻辑时递归修一次,
-#   之后属主已是 steam, 后续启动只做一次 O(1) 的 stat 判断即跳过。
-fix_owner() {
-    local dir="$1"
-    [ -d "${dir}" ] || return 0
-    local owner; owner="$(stat -c '%U' "${dir}" 2>/dev/null || echo '?')"
-    if [ "${owner}" != "${STEAM_USER}" ]; then
-        echo "    修复属主: ${dir} (当前 ${owner} -> ${STEAM_USER}), 递归中..."
-        chown -R "${STEAM_USER}:${STEAM_USER}" "${dir}" 2>/dev/null || true
-    fi
-}
-fix_owner "${STEAMCMD_DIR}"
-fix_owner "${INSTALL_DIR}"
 
 echo "==> [1/3] 安装 / 更新 PalServer (app ${APP_ID})"
 run_steamcmd() {
@@ -98,13 +76,9 @@ else
     echo "    已安装且关闭开机更新, 跳过。"
 fi
 
-# steamclient.so 软链 (PalServer 依赖)。注意最终以 steam 用户启动,
-# 故软链要建在 steam 的 HOME 下(降权后按运行用户的 ~/.steam/sdk64 查找)。
-STEAM_HOME="$(getent passwd "${STEAM_USER}" | cut -d: -f6)"
-STEAM_HOME="${STEAM_HOME:-/home/steam}"
-mkdir -p "${STEAM_HOME}/.steam/sdk64"
-ln -sf "${STEAMCMD_DIR}/linux64/steamclient.so" "${STEAM_HOME}/.steam/sdk64/steamclient.so" 2>/dev/null || true
-chown -R "${STEAM_USER}:${STEAM_USER}" "${STEAM_HOME}/.steam" 2>/dev/null || true
+# steamclient.so 软链 (PalServer 依赖)
+mkdir -p "${HOME}/.steam/sdk64"
+ln -sf "${STEAMCMD_DIR}/linux64/steamclient.so" "${HOME}/.steam/sdk64/steamclient.so" 2>/dev/null || true
 
 # ---- 配置文件处理 ----
 echo "==> [2/3] 处理 PalWorldSettings.ini"
@@ -148,15 +122,6 @@ set_opt "ServerPlayerMaxNum" "${PLAYERS}"
 
 echo "    配置就绪: REST=${REST_API_PORT} 端口=${PORT}"
 
-# root 刚才 mkdir 了 CONFIG_DIR 并写了配置文件, 这些新文件属主是 root。
-# 降权后的 PalServer 还要往 Pal/Saved/SaveGames 写存档, 故把整个 Saved 树校准给 steam。
-# 仍用"顶层属主非 steam 才递归"策略, 避免每次启动全量扫描存档 (存档可达数 GB)。
-SAVED_DIR="${INSTALL_DIR}/Pal/Saved"
-if [ -d "${SAVED_DIR}" ] && [ "$(stat -c '%U' "${SAVED_DIR}" 2>/dev/null)" != "${STEAM_USER}" ]; then
-    echo "    检测到 ${SAVED_DIR} 属主非 ${STEAM_USER}, 递归校准 (仅偶发, 之后不再触发)..."
-    chown -R "${STEAM_USER}:${STEAM_USER}" "${SAVED_DIR}" 2>/dev/null || true
-fi
-
 # ---- 组装启动参数 (arguments) ----
 echo "==> [3/3] 启动 PalServer"
 cd "${INSTALL_DIR}"
@@ -175,26 +140,4 @@ fi
 [ -n "${EXTRA_ARGS}" ]  && ARGS+=( ${EXTRA_ARGS} )
 
 echo "    启动参数: ${ARGS[*]}"
-
-# ---- 降权启动 ----
-# PalServer 本体拒绝以 root 运行, 故切到 steam 用户再 exec。
-# 优先 gosu(cm2network 镜像自带), 依次兜底 setpriv / su, 都没有才裸跑(会失败但给出明确提示)。
-if [ "$(id -u)" -eq 0 ]; then
-    echo "    以 ${STEAM_USER} 用户降权启动 PalServer"
-    if command -v gosu >/dev/null 2>&1; then
-        exec gosu "${STEAM_USER}" ./PalServer.sh "${ARGS[@]}"
-    elif command -v setpriv >/dev/null 2>&1; then
-        SUID="$(id -u "${STEAM_USER}")"; SGID="$(id -g "${STEAM_USER}")"
-        exec setpriv --reuid "${SUID}" --regid "${SGID}" --init-groups ./PalServer.sh "${ARGS[@]}"
-    elif command -v su >/dev/null 2>&1; then
-        # su 需要把参数拼成一条命令串, 逐个 shell 转义防止空格/特殊字符
-        cmd="./PalServer.sh"; for a in "${ARGS[@]}"; do cmd="${cmd} $(printf '%q' "$a")"; done
-        exec su "${STEAM_USER}" -c "${cmd}"
-    else
-        echo "    !! 未找到 gosu/setpriv/su, 无法降权; PalServer 将拒绝以 root 运行。"
-        exec ./PalServer.sh "${ARGS[@]}"
-    fi
-else
-    # 容器已经以非 root 用户启动(compose 指定了 user), 直接跑
-    exec ./PalServer.sh "${ARGS[@]}"
-fi
+exec ./PalServer.sh "${ARGS[@]}"

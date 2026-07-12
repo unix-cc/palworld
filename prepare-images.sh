@@ -24,7 +24,7 @@ MIRROR="${MIRROR%/}"   # 去掉结尾的 /
 
 # 需要的镜像:  "本地规范名|镜像站相对路径(官方镜像带 library/)"
 IMAGES=(
-    "cm2network/steamcmd:root|cm2network/steamcmd:root"
+    "cm2network/steamcmd:steam-bookworm|cm2network/steamcmd:steam-bookworm"
     "node:20.20-slim|node:20.20-slim"
     "python:3.12-slim|library/python:3.12-slim"
 )

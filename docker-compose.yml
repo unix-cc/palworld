@@ -9,7 +9,9 @@
 services:
   palworld-server:
     # 轻量镜像(~200MB), 服务端本体由 steamcmd 从 Steam CDN 拉取(国内可达)
-    image: cm2network/steamcmd:root
+    # steam-bookworm: 镜像默认以非 root 的 steam 用户(uid 1000)运行,
+    #   PalServer 可直接跑, 无需在 entrypoint 里降权/改属主。
+    image: cm2network/steamcmd:steam-bookworm
     container_name: palworld-server
     restart: unless-stopped
     stop_grace_period: 10s          # 关闭前留出存档时间
