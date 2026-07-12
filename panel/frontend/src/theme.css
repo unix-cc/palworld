@@ -1,0 +1,175 @@
+/* ============================================================================
+ * 幻兽帕鲁面板 · 设计系统 (Data-Dense Dashboard / Dark)
+ *
+ * 来源: UI/UX Pro Max 推荐的运维仪表盘深色配色。
+ *   底 #020617 / 卡片 #0F172A / 边框 #334155 / 强调绿 #22C55E / 危险红 #EF4444
+ *   正文 Fira Sans, 数值·ID·代码 Fira Code。
+ *
+ * 做法: 定义一套语义 token (--pal-*), 再用它们覆盖 Element Plus 的 CSS 变量,
+ *   使所有 el-* 组件自动套用本主题, 无需逐组件改样式。
+ * ========================================================================== */
+
+/* ---- 字体: 优先本地/系统, 缺失时用 CDN (index.html 里 preconnect) ---- */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* —— 语义色 token —— */
+  --pal-bg:            #020617;   /* 页面最底 */
+  --pal-surface:       #0F172A;   /* 卡片/侧栏面 */
+  --pal-surface-2:     #1A1E2F;   /* 次级面 (hover/条纹) */
+  --pal-surface-3:     #1E293B;   /* 输入框/更亮的面 */
+  --pal-border:        #334155;   /* 边框/分隔线 */
+  --pal-border-soft:   #24304a;   /* 更弱的边框 */
+
+  --pal-text:          #F8FAFC;   /* 主文字 */
+  --pal-text-muted:    #94A3B8;   /* 次要文字 */
+  --pal-text-faint:    #64748B;   /* 最弱文字/占位 */
+
+  --pal-accent:        #22C55E;   /* 强调绿: 运行中/主 CTA */
+  --pal-accent-hover:  #16A34A;
+  --pal-accent-soft:   rgba(34, 197, 94, 0.14);
+  --pal-danger:        #EF4444;   /* 危险: 停止/封禁/删除 */
+  --pal-danger-hover:  #DC2626;
+  --pal-warning:       #F59E0B;   /* 警告: 重启/踢出 */
+  --pal-info:          #38BDF8;   /* 信息 */
+
+  /* —— 间距节奏 (dense: 4/8 基准) —— */
+  --pal-space-1: 4px;
+  --pal-space-2: 8px;
+  --pal-space-3: 12px;
+  --pal-space-4: 16px;
+  --pal-space-5: 24px;
+  --pal-space-6: 32px;
+
+  --pal-radius:    10px;
+  --pal-radius-sm: 6px;
+
+  /* —— 字体族 —— */
+  --pal-font-sans: 'Fira Sans', -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  --pal-font-mono: 'Fira Code', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* —— 层级 —— */
+  --pal-z-header: 100;
+  --pal-z-aside:  90;
+
+  --pal-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.24);
+}
+
+/* ============================================================================
+ * 覆盖 Element Plus 变量 (深色)。html.dark 由 main.js 挂上。
+ * ========================================================================== */
+html.dark {
+  --el-color-primary: var(--pal-accent);
+  --el-color-primary-light-3: #4ade80;
+  --el-color-primary-light-5: #86efac;
+  --el-color-primary-light-7: #166534;
+  --el-color-primary-light-8: #14532d;
+  --el-color-primary-light-9: #052e16;
+  --el-color-primary-dark-2: var(--pal-accent-hover);
+
+  --el-color-success: var(--pal-accent);
+  --el-color-danger:  var(--pal-danger);
+  --el-color-error:   var(--pal-danger);
+  --el-color-warning: var(--pal-warning);
+  --el-color-info:    var(--pal-text-muted);
+
+  --el-bg-color:               var(--pal-surface);
+  --el-bg-color-page:          var(--pal-bg);
+  --el-bg-color-overlay:       var(--pal-surface);
+  --el-fill-color:             var(--pal-surface-2);
+  --el-fill-color-light:       var(--pal-surface-2);
+  --el-fill-color-lighter:     var(--pal-surface);
+  --el-fill-color-blank:       var(--pal-surface);
+  --el-fill-color-dark:        var(--pal-surface-3);
+  --el-fill-color-darker:      var(--pal-surface-3);
+
+  --el-text-color-primary:     var(--pal-text);
+  --el-text-color-regular:     #cbd5e1;
+  --el-text-color-secondary:   var(--pal-text-muted);
+  --el-text-color-placeholder: var(--pal-text-faint);
+  --el-text-color-disabled:    var(--pal-text-faint);
+
+  --el-border-color:           var(--pal-border);
+  --el-border-color-light:     var(--pal-border-soft);
+  --el-border-color-lighter:   var(--pal-border-soft);
+  --el-border-color-extra-light: var(--pal-border-soft);
+  --el-border-color-dark:      var(--pal-border);
+  --el-border-color-darker:    var(--pal-border);
+
+  --el-fill-color-blank: var(--pal-surface);
+  --el-mask-color: rgba(2, 6, 23, 0.7);
+
+  --el-font-family: var(--pal-font-sans);
+}
+
+/* ---- 全局基线 ---- */
+html, body, #app { height: 100%; margin: 0; }
+body {
+  font-family: var(--pal-font-sans);
+  background: var(--pal-bg);
+  color: var(--pal-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 数值/ID/代码统一等宽, 便于列对齐 (skill: number-tabular) */
+.pal-mono,
+.pal-num { font-family: var(--pal-font-mono); font-variant-numeric: tabular-nums; }
+
+/* 自定义滚动条, 契合深色 */
+* { scrollbar-width: thin; scrollbar-color: var(--pal-border) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--pal-border); border-radius: 6px; }
+*::-webkit-scrollbar-thumb:hover { background: #475569; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* 卡片统一观感 (圆角/边框/阴影) */
+.el-card {
+  --el-card-border-color: var(--pal-border-soft);
+  --el-card-border-radius: var(--pal-radius);
+  background: var(--pal-surface);
+  box-shadow: var(--pal-shadow) !important;
+}
+.el-card__header {
+  border-bottom: 1px solid var(--pal-border-soft);
+  font-weight: 600;
+}
+
+/* 表格 hover 行高亮 (skill: 行高亮) + 头部区分 */
+.el-table {
+  --el-table-border-color: var(--pal-border-soft);
+  --el-table-header-bg-color: var(--pal-surface-2);
+  --el-table-header-text-color: var(--pal-text-muted);
+  --el-table-row-hover-bg-color: var(--pal-accent-soft);
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  background: transparent;
+}
+
+/* 焦点可见 (skill: focus-states, 无障碍 CRITICAL) */
+:focus-visible {
+  outline: 2px solid var(--pal-accent);
+  outline-offset: 2px;
+}
+
+/* 可点击元素光标 (skill: cursor-pointer) */
+.el-button, .el-menu-item, .el-tag--dark, .el-switch,
+.el-table__row, [role='button'] { cursor: pointer; }
+
+/* 过渡时长 150-300ms (skill: duration-timing) */
+.el-button, .el-menu-item, .el-card, .el-tag {
+  transition: background-color .18s ease, border-color .18s ease,
+              color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+/* 尊重减少动效偏好 (skill: reduced-motion) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* 通用间距工具 */
+.pal-mt-4 { margin-top: var(--pal-space-4); }
+.pal-mt-5 { margin-top: var(--pal-space-5); }

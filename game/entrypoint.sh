@@ -51,11 +51,24 @@ fi
 #   -> "Refusing to run with the root privileges."
 # 因此策略是: 以 root 完成 steamcmd 安装/更新 + 写挂载目录(root 无视权限最省事),
 # 最后降权到镜像自带的 steam 用户(uid 1000) 来 exec PalServer。
-# 这里先把两处持久化目录 chown 给 steam, 保证降权后游戏进程能读写存档/配置。
-# 幂等, 每次启动都校准 (root 安装产生的新文件在末尾还会再 chown 一次)。
+# 这里先把两处持久化目录的属主校准给 steam, 保证降权后游戏进程能读写存档/配置。
 STEAM_USER="${STEAM_USER:-steam}"
-chown -R "${STEAM_USER}:${STEAM_USER}" "${STEAMCMD_DIR}" 2>/dev/null || true
-chown "${STEAM_USER}:${STEAM_USER}" "${INSTALL_DIR}" 2>/dev/null || true
+
+# fix_owner DIR : 自愈式 chown。仅当目录顶层属主不是 steam 时才整树递归 chown,
+#   避免每次启动都对几个 G 的存档全量递归(拖慢启动 + 无谓 IO)。
+#   典型场景: 早期误以 root 跑过, data 里遗留一批 root 属主文件, 首次切到本逻辑时递归修一次,
+#   之后属主已是 steam, 后续启动只做一次 O(1) 的 stat 判断即跳过。
+fix_owner() {
+    local dir="$1"
+    [ -d "${dir}" ] || return 0
+    local owner; owner="$(stat -c '%U' "${dir}" 2>/dev/null || echo '?')"
+    if [ "${owner}" != "${STEAM_USER}" ]; then
+        echo "    修复属主: ${dir} (当前 ${owner} -> ${STEAM_USER}), 递归中..."
+        chown -R "${STEAM_USER}:${STEAM_USER}" "${dir}" 2>/dev/null || true
+    fi
+}
+fix_owner "${STEAMCMD_DIR}"
+fix_owner "${INSTALL_DIR}"
 
 echo "==> [1/3] 安装 / 更新 PalServer (app ${APP_ID})"
 run_steamcmd() {
@@ -134,6 +147,15 @@ set_opt "ServerPlayerMaxNum" "${PLAYERS}"
 [ -n "${SERVER_PASSWORD}" ]    && set_opt "ServerPassword"    "\"${SERVER_PASSWORD}\""
 
 echo "    配置就绪: REST=${REST_API_PORT} 端口=${PORT}"
+
+# root 刚才 mkdir 了 CONFIG_DIR 并写了配置文件, 这些新文件属主是 root。
+# 降权后的 PalServer 还要往 Pal/Saved/SaveGames 写存档, 故把整个 Saved 树校准给 steam。
+# 仍用"顶层属主非 steam 才递归"策略, 避免每次启动全量扫描存档 (存档可达数 GB)。
+SAVED_DIR="${INSTALL_DIR}/Pal/Saved"
+if [ -d "${SAVED_DIR}" ] && [ "$(stat -c '%U' "${SAVED_DIR}" 2>/dev/null)" != "${STEAM_USER}" ]; then
+    echo "    检测到 ${SAVED_DIR} 属主非 ${STEAM_USER}, 递归校准 (仅偶发, 之后不再触发)..."
+    chown -R "${STEAM_USER}:${STEAM_USER}" "${SAVED_DIR}" 2>/dev/null || true
+fi
 
 # ---- 组装启动参数 (arguments) ----
 echo "==> [3/3] 启动 PalServer"

@@ -12,7 +12,7 @@ services:
     image: cm2network/steamcmd:root
     container_name: palworld-server
     restart: unless-stopped
-    stop_grace_period: 30s          # 关闭前留出存档时间
+    stop_grace_period: 10s          # 关闭前留出存档时间
     entrypoint: ["/bin/bash", "/entrypoint.sh"]
     ports:
       # 端口映射固定; 若改了 server.env 里的 PORT/REST_API_PORT, 需同步这里

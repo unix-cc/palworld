@@ -1,9 +1,14 @@
 <template>
   <el-card>
     <template #header>
-      <span>服务器配置 (PalWorldSettings.ini)</span>
-      <el-tag type="warning" size="small" style="margin-left: 8px">修改后需重启生效</el-tag>
-      <el-button style="float:right" :icon="Refresh" circle @click="load" :loading="loading" />
+      <div class="pal-card-hd">
+        <div class="hd-left">
+          <span>服务器配置</span>
+          <span class="pal-mono pal-hd-file">PalWorldSettings.ini</span>
+          <el-tag type="warning" size="small" effect="dark" round>修改后需重启生效</el-tag>
+        </div>
+        <el-button :icon="Refresh" circle @click="load" :loading="loading" />
+      </div>
     </template>
 
     <el-alert v-if="err" :title="err" type="error" :closable="false" style="margin-bottom: 12px" />
@@ -31,7 +36,7 @@
             </template>
 
             <div style="width: 100%">
-              <div style="display:flex; align-items:center; gap:8px">
+              <div class="field-row">
                 <!-- 布尔 -->
                 <el-switch v-if="row.meta.type === 'bool'" v-model="row.value" :disabled="row.meta.managed" />
                 <!-- 下拉 -->
@@ -50,7 +55,7 @@
                   size="default" style="max-width: 360px" />
 
                 <el-tag v-if="row.meta.managed" size="small" type="info">由启动配置管理</el-tag>
-                <span class="raw-key">{{ row.key }}</span>
+                <span class="raw-key pal-mono">{{ row.key }}</span>
               </div>
               <div class="desc">{{ row.meta.desc }}</div>
             </div>
@@ -64,16 +69,17 @@
       <el-tab-pane :label="`其它 (${others.length})`" name="others" v-if="others.length">
         <el-alert title="文档未收录 / 新版本新增的配置项, 原样以文本编辑。" type="info" :closable="false" style="margin-bottom: 12px" />
         <el-form label-width="320px" label-position="left">
-          <el-form-item v-for="row in others" :key="row.key" :label="row.key">
+          <el-form-item v-for="row in others" :key="row.key">
+            <template #label><span class="pal-mono">{{ row.key }}</span></template>
             <el-input v-model="row.value" size="default" style="max-width: 360px" />
           </el-form-item>
         </el-form>
       </el-tab-pane>
     </el-tabs>
 
-    <div style="margin-top: 16px;">
-      <el-button type="primary" @click="save" :loading="saving">保存配置</el-button>
-      <el-button type="warning" @click="saveAndRestart" :loading="saving">保存并重启</el-button>
+    <div class="save-bar">
+      <el-button type="primary" :icon="Check" @click="save" :loading="saving">保存配置</el-button>
+      <el-button type="warning" :icon="RefreshRight" @click="saveAndRestart" :loading="saving">保存并重启</el-button>
     </div>
   </el-card>
 </template>
@@ -81,7 +87,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Refresh } from '@element-plus/icons-vue'
+import { Refresh, RefreshRight, Check } from '@element-plus/icons-vue'
 import api from '../api'
 import { CATEGORIES, SCHEMA, toIniValue, fromIniValue } from '../settings_schema'
 
@@ -155,6 +161,15 @@ onMounted(load)
 </script>
 
 <style scoped>
-.desc { color: #909399; font-size: 12px; line-height: 1.5; margin-top: 2px; }
-.raw-key { color: #c0c4cc; font-size: 12px; font-family: monospace; }
+.pal-card-hd { display: flex; align-items: center; justify-content: space-between; }
+.hd-left { display: flex; align-items: center; gap: 10px; }
+.pal-hd-file { color: var(--pal-text-muted); font-size: 12px; }
+.field-row { display: flex; align-items: center; gap: 8px; }
+.desc { color: var(--pal-text-muted); font-size: 12px; line-height: 1.5; margin-top: 4px; }
+.raw-key { color: var(--pal-text-faint); font-size: 12px; }
+.save-bar {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--pal-border-soft);
+  display: flex; gap: 12px;
+}
 </style>
