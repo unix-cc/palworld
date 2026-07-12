@@ -1,5 +1,6 @@
 # Claude Code / 本地 skill、缓存 (不纳入版本管理)
 .claude/
+data/
 
 # 环境变量 / 密钥 (含 ADMIN_PASSWORD / PANEL_PASSWORD / JWT_SECRET, 严禁入库)
 # 只保留 *.example 模板
