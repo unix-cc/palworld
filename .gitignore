@@ -1,2 +1,10 @@
 # Claude Code / 本地 skill、缓存 (不纳入版本管理)
 .claude/
+
+# Python 缓存 / 编译产物
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
