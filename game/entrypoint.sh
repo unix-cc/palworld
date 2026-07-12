@@ -10,13 +10,10 @@ set -e
 # ---- 环境默认值 (均来自 game/server.env, 这里仅兜底) ----
 INSTALL_DIR="/palworld"
 APP_ID=2394010
-# steamcmd 本体持久化到独立挂载 /opt/steamcmd (compose 里挂 ./data/steamcmd),
-# 而非镜像内的 /home/steam/steamcmd。否则 down 删容器后再 up, steamcmd 会从镜像重新
-# 引导自更新, 每次都白下一遍。
-# 注意: 不能放进 /palworld 内, 否则 app_update ... validate 会校验到这个嵌套目录,
-#       导致 "Missing file permissions"。二者必须各自独立持久化。
-STEAMCMD_DIR="${STEAMCMD_DIR:-/opt/steamcmd}"
-STEAMCMD_BUILTIN="/home/steam/steamcmd"     # 镜像自带的 steamcmd
+# 直接使用镜像自带的 steamcmd (位于 steam 用户 HOME 下), 不再复制到额外挂载。
+# 镜像层本身已包含装好的 steamcmd, 跨 down/up 保留, 无需单独 volume 持久化,
+# 也就免去了对宿主机挂载目录做 chown 的麻烦。
+STEAMCMD_DIR="${STEAMCMD_DIR:-/home/steam/steamcmd}"
 
 # 启动参数相关
 PORT="${PORT:-8211}"
@@ -40,13 +37,6 @@ UPDATE_ON_BOOT="${UPDATE_ON_BOOT:-true}"
 CONFIG_DIR="${INSTALL_DIR}/Pal/Saved/Config/LinuxServer"
 CONFIG_FILE="${CONFIG_DIR}/PalWorldSettings.ini"
 DEFAULT_CONFIG="${INSTALL_DIR}/DefaultPalWorldSettings.ini"
-
-# 首次把镜像自带的 steamcmd 复制到持久化目录 (仅一次, 后续复用, 免去重新引导)
-if [ ! -x "${STEAMCMD_DIR}/steamcmd.sh" ]; then
-    echo "==> [0/3] 初始化持久化 steamcmd -> ${STEAMCMD_DIR}"
-    mkdir -p "${STEAMCMD_DIR}"
-    cp -a "${STEAMCMD_BUILTIN}/." "${STEAMCMD_DIR}/"
-fi
 
 echo "==> [1/3] 安装 / 更新 PalServer (app ${APP_ID})"
 run_steamcmd() {
