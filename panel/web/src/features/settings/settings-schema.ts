@@ -53,32 +53,39 @@ export const SCHEMA: Record<string, FieldMeta> = {
   BaseCampMaxNum: {
     cat: 'performance', label: '全服据点总数上限', type: 'int',
     desc: '整个服务器允许存在的据点(基地)总数量。',
+    min: 0, max: 1000, step: 1,
   },
   BaseCampMaxNumInGuild: {
     cat: 'performance', label: '每公会据点数上限', type: 'int',
     desc: '单个公会可拥有的最大据点数。默认 4, 最大 10。',
     note: '调高会增加处理负载。',
+    min: 1, max: 10, step: 1,
   },
   BaseCampWorkerMaxNum: {
     cat: 'performance', label: '每据点帕鲁数上限', type: 'int',
     desc: '单个据点内可工作的帕鲁最大数量 (最大 50)。',
     note: '调高会增加处理负载。',
+    min: 1, max: 50, step: 1,
   },
   ItemContainerForceMarkDirtyInterval: {
     cat: 'performance', label: '容器界面同步间隔(秒)', type: 'float',
     desc: '打开箱子/容器界面时, 强制重新同步的时间间隔 (秒)。',
+    min: 0, max: 5, step: 0.1,
   },
   MaxBuildingLimitNum: {
     cat: 'performance', label: '每人建筑数量上限', type: 'int',
     desc: '每个玩家可建造的建筑数量上限 (0 = 不限制)。',
+    min: 0, max: 5000, step: 10,
   },
   PhysicsActiveDropItemMaxNum: {
     cat: 'performance', label: '掉落物物理数量上限', type: 'int',
     desc: '可参与物理行为(受力/滚动)的掉落物最大数量。',
+    min: 100, max: 5000, step: 100,
   },
   ServerReplicatePawnCullDistance: {
     cat: 'performance', label: '帕鲁同步距离(cm)', type: 'float',
     desc: '帕鲁相对玩家的同步距离 (单位 cm)。最小 5000, 最大 15000。',
+    min: 5000, max: 15000, step: 500,
   },
 
   // -------------------------------------------------------------- 服务器管理
@@ -147,6 +154,7 @@ export const SCHEMA: Record<string, FieldMeta> = {
   ChatPostLimitPerMinute: {
     cat: 'server', label: '每分钟聊天上限', type: 'int',
     desc: '每分钟允许发送的聊天消息条数上限。',
+    min: 0, max: 120, step: 5,
   },
   LogFormatType: {
     cat: 'server', label: '日志格式', type: 'select', options: ['Text', 'Json'],
@@ -193,10 +201,12 @@ export const SCHEMA: Record<string, FieldMeta> = {
   VoiceChatMaxVolumeDistance: {
     cat: 'features', label: '语音满音量距离', type: 'float',
     desc: '语音音量不衰减的距离 (此距离内音量最大)。',
+    min: 0, max: 5000, step: 100,
   },
   VoiceChatZeroVolumeDistance: {
     cat: 'features', label: '语音静音距离', type: 'float',
     desc: '语音音量衰减为零的距离。',
+    min: 0, max: 20000, step: 500,
   },
   bShowPlayerList: {
     cat: 'features', label: 'ESC菜单玩家列表', type: 'bool',
@@ -240,7 +250,8 @@ export const SCHEMA: Record<string, FieldMeta> = {
   },
   AutoResetGuildTimeNoOnlinePlayers: {
     cat: 'features', label: '公会重置离线时长', type: 'float',
-    desc: '触发上面「公会无人自动重置」所需的离线时长。若该项关闭则忽略。',
+    desc: '触发上面「公会无人自动重置」所需的离线时长 (小时)。若该项关闭则忽略。',
+    min: 1, max: 168, step: 1,
   },
   bAllowGlobalPalboxExport: {
     cat: 'features', label: '允许上传全局帕鲁盒', type: 'bool',
@@ -295,10 +306,12 @@ export const SCHEMA: Record<string, FieldMeta> = {
   BlockRespawnTime: {
     cat: 'balance', label: '复活冷却(秒)', type: 'int',
     desc: '死亡后可再次复活前的冷却时间 (秒)。',
+    min: 0, max: 300, step: 5,
   },
   RespawnPenaltyDurationThreshold: {
     cat: 'balance', label: '复活惩罚生存阈值(秒)', type: 'float',
     desc: '生存时间阈值(秒): 低于该值时再次死亡, 将套用下面的复活冷却倍率。',
+    min: 0, max: 600, step: 10,
   },
   RespawnPenaltyTimeScale: {
     cat: 'balance', label: '复活惩罚冷却倍率', type: 'float',
@@ -343,6 +356,7 @@ export const SCHEMA: Record<string, FieldMeta> = {
   SupplyDropSpan: {
     cat: 'balance', label: '补给/陨石间隔(分)', type: 'int',
     desc: '陨石 / 空投补给的出现间隔 (分钟)。',
+    min: 0, max: 240, step: 5,
   },
   MonsterFarmActionSpeedRate: {
     cat: 'balance', label: '放牧产出速度倍率', type: 'float',
@@ -438,10 +452,12 @@ export const SCHEMA: Record<string, FieldMeta> = {
   GuildPlayerMaxNum: {
     cat: 'balance', label: '公会人数上限', type: 'int',
     desc: '单个公会的最大成员数。',
+    min: 1, max: 100, step: 1,
   },
   GuildRejoinCooldownMinutes: {
     cat: 'balance', label: '公会重新加入冷却(分)', type: 'int',
     desc: '退出后重新加入公会的冷却时间 (分钟)。',
+    min: 0, max: 1440, step: 5,
   },
   DenyTechnologyList: {
     cat: 'balance', label: '禁用科技列表', type: 'text',
@@ -458,6 +474,7 @@ export const SCHEMA: Record<string, FieldMeta> = {
   AdditionalDropItemNumWhenPlayerKillingInPvPMode: {
     cat: 'balance', label: 'PvP额外掉落数量', type: 'int',
     desc: '启用 PvP 额外掉落时, 掉落物品的数量。',
+    min: 0, max: 100, step: 1,
   },
 }
 

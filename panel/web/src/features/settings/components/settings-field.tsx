@@ -10,6 +10,7 @@ import { Info } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -34,6 +35,16 @@ interface SettingsFieldProps {
 
 export function SettingsField({ fieldKey, meta, value, onChange }: SettingsFieldProps) {
   const disabled = !!meta.managed
+  const isNumeric = meta.type === 'int' || meta.type === 'float'
+  // 有明确 min/max 的数值项 -> 滑块 + 数字框组合
+  const hasRange = isNumeric && meta.min !== undefined && meta.max !== undefined
+  const step = meta.step ?? (meta.type === 'float' ? 0.1 : 1)
+
+  function handleNumberInput(raw: string) {
+    if (raw === '') return onChange('')
+    const n = Number(raw)
+    onChange(Number.isNaN(n) ? raw : n)
+  }
 
   return (
     <div className="grid grid-cols-1 gap-2 border-b border-border/60 py-4 last:border-0 md:grid-cols-[minmax(0,320px)_1fr] md:items-start md:gap-6">
@@ -84,21 +95,41 @@ export function SettingsField({ fieldKey, meta, value, onChange }: SettingsField
                 ))}
               </SelectContent>
             </Select>
-          ) : meta.type === 'int' || meta.type === 'float' ? (
+          ) : hasRange ? (
+            // 倍率 / 有界数值: 滑块 + 数字框。滑块受限于 [min,max], 数字框仍可越界输入。
+            <div className="flex w-full max-w-md items-center gap-4">
+              <Slider
+                id={fieldKey}
+                className="min-w-0 flex-1"
+                min={meta.min}
+                max={meta.max}
+                step={step}
+                disabled={disabled}
+                value={[typeof value === 'number' ? value : (meta.min as number)]}
+                onValueChange={(v) => onChange(v[0] ?? (meta.min as number))}
+                aria-label={meta.label}
+              />
+              <Input
+                type="number"
+                inputMode="decimal"
+                step={step}
+                className="w-24 shrink-0 font-mono tabular-nums"
+                value={value === '' ? '' : String(value)}
+                disabled={disabled}
+                onChange={(e) => handleNumberInput(e.target.value)}
+                aria-label={`${meta.label} 数值`}
+              />
+            </div>
+          ) : isNumeric ? (
             <Input
               id={fieldKey}
               type="number"
               inputMode="decimal"
-              step={meta.type === 'float' ? '0.1' : '1'}
-              className="w-48 font-mono"
+              step={step}
+              className="w-48 font-mono tabular-nums"
               value={value === '' ? '' : String(value)}
               disabled={disabled}
-              onChange={(e) => {
-                const raw = e.target.value
-                if (raw === '') return onChange('')
-                const n = Number(raw)
-                onChange(Number.isNaN(n) ? raw : n)
-              }}
+              onChange={(e) => handleNumberInput(e.target.value)}
             />
           ) : (
             <Input
