@@ -26,6 +26,13 @@ export interface FieldMeta {
   options?: string[]
   managed?: boolean
   note?: string
+  /**
+   * 数值项 (int/float) 的滑块范围。给定后渲染「滑块 + 数字框」组合。
+   * 范围对齐游戏内「世界设置」滑块的常用边界; 数字框仍可自由输入 (允许超出滑块范围)。
+   */
+  min?: number
+  max?: number
+  step?: number
 }
 
 export interface Category {
@@ -268,14 +275,17 @@ export const SCHEMA: Record<string, FieldMeta> = {
   ExpRate: {
     cat: 'balance', label: '经验倍率', type: 'float',
     desc: '经验值获取倍率。',
+    min: 0.1, max: 20, step: 0.1,
   },
   DayTimeSpeedRate: {
     cat: 'balance', label: '白天流速', type: 'float',
     desc: '白天时间流逝速度。',
+    min: 0.1, max: 5, step: 0.1,
   },
   NightTimeSpeedRate: {
     cat: 'balance', label: '夜晚流速', type: 'float',
     desc: '夜晚时间流逝速度。',
+    min: 0.1, max: 5, step: 0.1,
   },
   DeathPenalty: {
     cat: 'balance', label: '死亡惩罚', type: 'select',
@@ -293,34 +303,42 @@ export const SCHEMA: Record<string, FieldMeta> = {
   RespawnPenaltyTimeScale: {
     cat: 'balance', label: '复活惩罚冷却倍率', type: 'float',
     desc: '施加于复活冷却时间的倍率。',
+    min: 0.1, max: 10, step: 0.1,
   },
   CollectionDropRate: {
     cat: 'balance', label: '采集掉落倍率', type: 'float',
     desc: '可采集物品的掉落数量倍率。',
+    min: 0.5, max: 3, step: 0.1,
   },
   CollectionObjectHpRate: {
     cat: 'balance', label: '采集物血量倍率', type: 'float',
     desc: '可采集物体的血量倍率。',
+    min: 0.5, max: 3, step: 0.1,
   },
   CollectionObjectRespawnSpeedRate: {
     cat: 'balance', label: '采集物重生间隔', type: 'float',
     desc: '可采集物体的重生间隔倍率。',
+    min: 0.5, max: 3, step: 0.1,
   },
   EnemyDropItemRate: {
     cat: 'balance', label: '敌人掉落倍率', type: 'float',
     desc: '击败敌人掉落物品的数量倍率。',
+    min: 0.5, max: 3, step: 0.1,
   },
   ItemWeightRate: {
     cat: 'balance', label: '物品重量倍率', type: 'float',
     desc: '物品重量倍率。',
+    min: 0, max: 5, step: 0.1,
   },
   ItemCorruptionMultiplier: {
     cat: 'balance', label: '物品腐坏速度倍率', type: 'float',
     desc: '物品腐坏速度倍率。',
+    min: 0, max: 10, step: 0.1,
   },
   EquipmentDurabilityDamageRate: {
     cat: 'balance', label: '装备耐久损耗倍率', type: 'float',
     desc: '装备耐久度损耗倍率。',
+    min: 0, max: 10, step: 0.1,
   },
   SupplyDropSpan: {
     cat: 'balance', label: '补给/陨石间隔(分)', type: 'int',
@@ -329,75 +347,93 @@ export const SCHEMA: Record<string, FieldMeta> = {
   MonsterFarmActionSpeedRate: {
     cat: 'balance', label: '放牧产出速度倍率', type: 'float',
     desc: '牧场放牧的物品产出速度倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   BuildObjectDamageRate: {
     cat: 'balance', label: '建筑受伤倍率', type: 'float',
     desc: '对建筑造成伤害的倍率。',
+    min: 0.5, max: 3, step: 0.1,
   },
   BuildObjectDeteriorationDamageRate: {
     cat: 'balance', label: '建筑老化速度倍率', type: 'float',
     desc: '建筑自然老化(损坏)速度倍率。',
+    min: 0, max: 10, step: 0.1,
   },
   PlayerDamageRateAttack: {
     cat: 'balance', label: '玩家攻击倍率', type: 'float',
     desc: '玩家造成伤害的倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PlayerDamageRateDefense: {
     cat: 'balance', label: '玩家受伤倍率', type: 'float',
     desc: '玩家受到伤害的倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PlayerAutoHPRegeneRate: {
     cat: 'balance', label: '玩家自然回血倍率', type: 'float',
     desc: '玩家自然生命恢复倍率。',
+    min: 0.1, max: 10, step: 0.1,
   },
   PlayerAutoHpRegeneRateInSleep: {
     cat: 'balance', label: '玩家睡眠回血倍率', type: 'float',
     desc: '玩家睡眠时生命恢复倍率。',
+    min: 0.1, max: 10, step: 0.1,
   },
   PlayerStaminaDecreaceRate: {
     cat: 'balance', label: '玩家耐力消耗倍率', type: 'float',
     desc: '玩家耐力消耗速度倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PlayerStomachDecreaceRate: {
     cat: 'balance', label: '玩家饱食下降倍率', type: 'float',
     desc: '玩家饱食度下降速度倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PalDamageRateAttack: {
     cat: 'balance', label: '帕鲁攻击倍率', type: 'float',
     desc: '帕鲁造成伤害的倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PalDamageRateDefense: {
     cat: 'balance', label: '帕鲁受伤倍率', type: 'float',
     desc: '帕鲁受到伤害的倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PalCaptureRate: {
     cat: 'balance', label: '捕捉率倍率', type: 'float',
     desc: '帕鲁捕捉成功率倍率。',
+    min: 0.5, max: 2, step: 0.1,
   },
   PalSpawnNumRate: {
     cat: 'balance', label: '帕鲁刷新数量倍率', type: 'float',
     desc: '野生帕鲁刷新数量倍率。',
     note: '影响性能。',
+    min: 0.5, max: 3, step: 0.1,
   },
   PalAutoHPRegeneRate: {
     cat: 'balance', label: '帕鲁自然回血倍率', type: 'float',
     desc: '帕鲁自然生命恢复倍率。',
+    min: 0.1, max: 10, step: 0.1,
   },
   PalAutoHpRegeneRateInSleep: {
     cat: 'balance', label: '帕鲁睡眠回血倍率', type: 'float',
     desc: '帕鲁在帕鲁盒中睡眠时的生命恢复倍率。',
+    min: 0.1, max: 10, step: 0.1,
   },
   PalStaminaDecreaceRate: {
     cat: 'balance', label: '帕鲁耐力消耗倍率', type: 'float',
     desc: '帕鲁耐力消耗速度倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PalStomachDecreaceRate: {
     cat: 'balance', label: '帕鲁饱食下降倍率', type: 'float',
     desc: '帕鲁饱食度下降速度倍率。',
+    min: 0.1, max: 5, step: 0.1,
   },
   PalEggDefaultHatchingTime: {
     cat: 'balance', label: '巨蛋孵化时间(时)', type: 'float',
     desc: '孵化巨蛋所需时间 (小时)。注: 其它蛋也需要孵化时间。',
+    min: 0, max: 72, step: 1,
   },
   GuildPlayerMaxNum: {
     cat: 'balance', label: '公会人数上限', type: 'int',
