@@ -40,7 +40,7 @@ function pingTone(ping: number | null | undefined) {
 
 interface PlayersTableProps {
   data: Player[]
-  onAction: (action: 'kick' | 'ban', player: Player) => void | Promise<void>
+  onAction: (action: 'kick' | 'ban', player: Player) => unknown | Promise<unknown>
 }
 
 export function PlayersTable({ data, onAction }: PlayersTableProps) {

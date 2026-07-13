@@ -22,7 +22,7 @@ export default function PlayersPage() {
   const action = usePlayerAction()
   const [unbanId, setUnbanId] = useState('')
 
-  const players = data?.players ?? []
+  const players = data ?? []
 
   function handleRowAction(act: 'kick' | 'ban', player: Player) {
     return action.mutateAsync({ action: act, userid: player.userId })

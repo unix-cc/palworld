@@ -52,7 +52,7 @@ export default function SettingsPage() {
     balance: [],
   })
   const [others, setOthers] = React.useState<OtherRow[]>([])
-  const [tab, setTab] = React.useState<string>(CATEGORIES[0].key)
+  const [tab, setTab] = React.useState<string>('performance')
 
   // 数据到达后填充本地编辑态
   React.useEffect(() => {
