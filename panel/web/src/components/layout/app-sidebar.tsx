@@ -63,13 +63,46 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   )
 }
 
-/** 桌面固定侧栏容器。 */
-export function AppSidebar() {
+interface AppSidebarProps {
+  /** 桌面折叠 (宽度归零) */
+  collapsed: boolean
+  /** 移动端抽屉开合 */
+  mobileOpen: boolean
+  /** 关闭移动端抽屉 (点击遮罩 / 导航后) */
+  onMobileClose: () => void
+}
+
+/**
+ * 侧栏容器:
+ * - 桌面 (md+): 固定列, collapsed 时宽度收起并隐藏。
+ * - 移动端: 遮罩 + 抽屉, 复用同一份 SidebarContent。
+ */
+export function AppSidebar({ collapsed, mobileOpen, onMobileClose }: AppSidebarProps) {
   return (
-    <aside className="hidden w-60 shrink-0 border-r border-sidebar-border md:block">
-      <div className="fixed inset-y-0 left-0 w-60">
+    <>
+      {/* 桌面侧栏 */}
+      <aside
+        className={cn(
+          'hidden shrink-0 border-r border-sidebar-border transition-[width] duration-200 md:block',
+          collapsed ? 'w-0 overflow-hidden border-r-0' : 'w-60',
+        )}
+      >
         <SidebarContent />
-      </div>
-    </aside>
+      </aside>
+
+      {/* 移动端抽屉 */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={onMobileClose}
+            aria-hidden
+          />
+          <div className="absolute inset-y-0 left-0 w-60 border-r border-sidebar-border shadow-xl">
+            <SidebarContent onNavigate={onMobileClose} />
+          </div>
+        </div>
+      )}
+    </>
   )
 }
