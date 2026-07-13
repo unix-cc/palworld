@@ -26,6 +26,14 @@ const toneClass: Record<NonNullable<StatCardProps['tone']>, string> = {
   muted: 'text-muted-foreground',
 }
 
+const iconToneClass: Record<NonNullable<StatCardProps['tone']>, string> = {
+  default: 'text-muted-foreground/60',
+  success: 'text-success/70',
+  warning: 'text-warning/70',
+  destructive: 'text-destructive/70',
+  muted: 'text-muted-foreground/60',
+}
+
 export function StatCard({
   label,
   value,
@@ -38,20 +46,30 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        'relative gap-0 overflow-hidden p-5',
-        accent && 'ring-1 ring-success/40',
+        'relative gap-0 overflow-hidden p-4',
+        accent && 'ring-1 ring-inset ring-success/30',
         className,
       )}
     >
-      {accent ? <span className="absolute inset-y-0 left-0 w-0.5 bg-success" /> : null}
+      {accent ? (
+        <span
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/60 to-transparent"
+        />
+      ) : null}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{label}</span>
-        {Icon ? <Icon className="h-4 w-4 text-muted-foreground/70" /> : null}
+        <span className="text-xs font-medium tracking-tight text-muted-foreground">{label}</span>
+        {Icon ? <Icon className={cn('h-4 w-4', iconToneClass[tone])} /> : null}
       </div>
-      <div className={cn('mt-2 text-3xl font-bold leading-tight tabular', toneClass[tone])}>
+      <div
+        className={cn(
+          'mt-2.5 text-[26px] font-semibold leading-none tracking-tight tabular',
+          toneClass[tone],
+        )}
+      >
         {value}
       </div>
-      {sub ? <div className="mt-1 text-sm text-muted-foreground">{sub}</div> : null}
+      {sub ? <div className="mt-1.5 text-xs text-muted-foreground">{sub}</div> : null}
     </Card>
   )
 }

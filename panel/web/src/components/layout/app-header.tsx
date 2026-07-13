@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * 顶部栏: 折叠按钮 + 页面标题 + 实时服务器状态 + 主题切换 + 退出。
+ * 顶部栏: 折叠按钮 + 页面标题 + ⌘K 入口 + 实时服务器状态 + 主题切换 + 退出。
  * 状态用轻量轮询 (与 dashboard 共享同一 query key, 自动去重)。
  */
 import { usePathname, useRouter } from 'next/navigation'
-import { PanelLeft, LogOut } from 'lucide-react'
+import { PanelLeft, LogOut, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatusIndicator } from '@/components/shared/status-indicator'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
@@ -49,23 +49,55 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) 
     router.replace('/login')
   }
 
+  function openPalette() {
+    window.dispatchEvent(new Event('open-command-palette'))
+  }
+
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/80 px-4 backdrop-blur-md md:px-6">
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-border bg-background/70 px-4 backdrop-blur-xl md:px-6">
+      <div className="flex min-w-0 items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={onToggleSidebar}
           aria-label="切换侧边栏"
-          className="shrink-0"
+          className="shrink-0 text-muted-foreground"
         >
-          <PanelLeft className="size-5" />
+          <PanelLeft className="size-[18px]" />
         </Button>
-        <h1 className="text-base font-semibold tracking-tight">{pageTitle}</h1>
+        <nav aria-label="面包屑" className="flex min-w-0 items-center gap-1.5 text-[13px]">
+          <span className="hidden text-muted-foreground sm:inline">帕鲁面板</span>
+          <span className="hidden text-muted-foreground/50 sm:inline">/</span>
+          <span className="truncate font-medium tracking-tight text-foreground">{pageTitle}</span>
+        </nav>
       </div>
 
-      <div className="flex items-center gap-2">
-        <StatusIndicator tone={tone} label={text} />
+      <div className="flex items-center gap-1.5">
+        {/* ⌘K 命令面板入口 */}
+        <button
+          onClick={openPalette}
+          className="hidden h-8 items-center gap-2 rounded-md border border-border bg-elevated/40 pl-2.5 pr-1.5 text-[13px] text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground sm:flex"
+          aria-label="打开命令面板"
+        >
+          <Search className="size-3.5" />
+          <span>搜索…</span>
+          <kbd className="ml-1 rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
+            ⌘K
+          </kbd>
+        </button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={openPalette}
+          aria-label="打开命令面板"
+          className="text-muted-foreground sm:hidden"
+        >
+          <Search className="size-[18px]" />
+        </Button>
+
+        <div className="mx-1 hidden sm:block">
+          <StatusIndicator tone={tone} label={text} pulse={tone === 'running'} />
+        </div>
         <ThemeToggle />
         <Tooltip>
           <TooltipTrigger asChild>
@@ -76,7 +108,7 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) 
               aria-label="退出登录"
               className="text-muted-foreground hover:text-destructive"
             >
-              <LogOut className="size-5" />
+              <LogOut className="size-[18px]" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>退出登录</TooltipContent>

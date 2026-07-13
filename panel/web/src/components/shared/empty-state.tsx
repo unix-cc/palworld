@@ -19,8 +19,8 @@ export function EmptyState({ icon: Icon, title, description, action, className }
       )}
     >
       {Icon ? (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
-          <Icon className="h-6 w-6" />
+        <div className="surface-highlight flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-elevated text-muted-foreground">
+          <Icon className="h-5 w-5" />
         </div>
       ) : null}
       <div className="space-y-1">

@@ -227,7 +227,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* 保存栏 */}
-      <div className="sticky bottom-0 flex flex-wrap gap-3 border-t border-border bg-background/80 py-4 backdrop-blur-md">
+      <div className="sticky bottom-0 flex flex-wrap gap-3 border-t border-border bg-background/70 py-4 backdrop-blur-xl">
         <Button onClick={handleSave} disabled={saving || isLoading}>
           <Save />
           {updateIni.isPending && !serverAction.isPending ? '保存中…' : '保存配置'}

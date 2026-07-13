@@ -2,135 +2,154 @@
 @import 'tw-animate-css';
 
 /* ============================================================================
- * 幻兽帕鲁面板 · 设计系统 (Modern SaaS Admin / Dual Theme)
+ * 幻兽帕鲁面板 · 设计系统 (Linear-inspired · Dark-dense · Dual Theme)
  *
- * 设计语言: Linear · Vercel · Stripe · Notion 取向的企业级控制台。
- *   中性 slate/zinc 底色 · Indigo 主强调 (CTA/激活/焦点) · Emerald 语义状态 (运行/健康)
- *   正文 Fira Sans, 数值·ID·代码 Fira Code (等宽, tabular-nums)。
+ * 设计语言: Linear 取向的暗色致密控制台。
+ *   近黑带蓝的 canvas · 分层表面 (canvas < card < elevated) · 发丝级 1px 边框
+ *   单一靛紫强调 (CTA/激活/焦点) · 语义色降饱和仅用于状态
+ *   正文 Geist (紧字距/13-14px), 数值·ID·代码 Geist Mono (等宽, tabular-nums)。
  *
- * 令牌驱动: 所有颜色走语义 token (--background/--primary/...), 组件不写死 hex,
- *   light/dark 两套值成对定义, 保证对比度与主题一致性。
+ * 令牌驱动: 所有颜色走语义 token, 组件不写死 hex, light/dark 成对定义。
+ *   字体走 next/font 自托管 (--font-geist-sans / --font-geist-mono), 无 CDN 依赖。
  * ========================================================================== */
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.5rem;
 
-  --background: hsl(210 40% 98%);
-  --foreground: hsl(222 47% 11%);
+  /* 表面分层: 背景 < 卡片 < 浮层 */
+  --background: hsl(210 20% 99%);
+  --foreground: hsl(222 32% 12%);
 
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(222 47% 11%);
+  --card-foreground: hsl(222 32% 12%);
+
+  --elevated: hsl(210 20% 100%);
+  --elevated-foreground: hsl(222 32% 12%);
 
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(222 47% 11%);
+  --popover-foreground: hsl(222 32% 12%);
 
-  /* Indigo 主强调 */
-  --primary: hsl(243 75% 59%);
+  /* 靛紫主强调 */
+  --primary: hsl(243 75% 58%);
   --primary-foreground: hsl(0 0% 100%);
 
-  --secondary: hsl(210 40% 96%);
-  --secondary-foreground: hsl(222 47% 11%);
+  --secondary: hsl(214 20% 96%);
+  --secondary-foreground: hsl(222 28% 20%);
 
-  --muted: hsl(210 40% 96%);
-  --muted-foreground: hsl(215 16% 47%);
+  --muted: hsl(214 20% 96%);
+  --muted-foreground: hsl(220 12% 46%);
 
-  --accent: hsl(210 40% 96%);
-  --accent-foreground: hsl(222 47% 11%);
+  --accent: hsl(214 20% 95%);
+  --accent-foreground: hsl(222 32% 12%);
 
-  --destructive: hsl(0 72% 51%);
+  --destructive: hsl(0 68% 51%);
   --destructive-foreground: hsl(0 0% 100%);
 
-  /* Emerald 语义状态 (运行/健康/成功) */
-  --success: hsl(160 84% 32%);
+  --success: hsl(158 74% 34%);
   --success-foreground: hsl(0 0% 100%);
 
-  /* Amber 警告 */
-  --warning: hsl(35 92% 42%);
+  --warning: hsl(32 90% 44%);
   --warning-foreground: hsl(0 0% 100%);
 
-  --border: hsl(214 32% 91%);
-  --input: hsl(214 32% 91%);
-  --ring: hsl(243 75% 59%);
+  /* 边框: border 为常态发丝级, border-strong 为 hover/强调 */
+  --border: hsl(216 18% 90%);
+  --border-strong: hsl(216 16% 82%);
+  --input: hsl(216 18% 88%);
+  --ring: hsl(243 75% 58%);
 
-  /* 代码/日志区 */
-  --code-bg: hsl(222 47% 11%);
-  --code-fg: hsl(214 32% 91%);
+  /* 顶部高光 (卡片/按钮上缘 1px) */
+  --highlight: hsl(0 0% 100% / 0.7);
 
-  /* 图表色板 (可及, 非纯红/绿对) */
-  --chart-1: hsl(243 75% 59%);
-  --chart-2: hsl(160 84% 39%);
-  --chart-3: hsl(35 92% 50%);
-  --chart-4: hsl(199 89% 48%);
-  --chart-5: hsl(280 65% 60%);
+  --code-bg: hsl(222 30% 10%);
+  --code-fg: hsl(216 22% 84%);
 
-  --sidebar: hsl(0 0% 100%);
-  --sidebar-foreground: hsl(222 47% 11%);
-  --sidebar-border: hsl(214 32% 91%);
+  --chart-1: hsl(243 75% 58%);
+  --chart-2: hsl(158 74% 40%);
+  --chart-3: hsl(32 90% 50%);
+  --chart-4: hsl(199 85% 48%);
+  --chart-5: hsl(280 62% 60%);
+
+  --sidebar: hsl(214 22% 98%);
+  --sidebar-foreground: hsl(222 32% 12%);
+  --sidebar-border: hsl(216 18% 90%);
+  --sidebar-accent: hsl(214 20% 94%);
 }
 
 .dark {
-  --background: hsl(222 24% 4%);
-  --foreground: hsl(240 5% 96%);
+  /* 近黑带蓝的 canvas, 表面逐层提亮做分层 */
+  --background: hsl(224 24% 5%);
+  --foreground: hsl(220 14% 96%);
 
-  --card: hsl(228 16% 7%);
-  --card-foreground: hsl(240 5% 96%);
+  --card: hsl(225 18% 8%);
+  --card-foreground: hsl(220 14% 96%);
 
-  --popover: hsl(228 16% 8%);
-  --popover-foreground: hsl(240 5% 96%);
+  --elevated: hsl(225 16% 11%);
+  --elevated-foreground: hsl(220 14% 96%);
 
-  /* Indigo 深色下略提亮以保对比 */
-  --primary: hsl(239 84% 67%);
+  --popover: hsl(225 16% 10%);
+  --popover-foreground: hsl(220 14% 96%);
+
+  /* 靛紫深色下略提亮以保对比 */
+  --primary: hsl(240 82% 68%);
   --primary-foreground: hsl(0 0% 100%);
 
-  --secondary: hsl(228 12% 11%);
-  --secondary-foreground: hsl(240 5% 96%);
+  --secondary: hsl(225 14% 13%);
+  --secondary-foreground: hsl(220 14% 92%);
 
-  --muted: hsl(228 12% 11%);
-  --muted-foreground: hsl(218 9% 64%);
+  --muted: hsl(225 14% 13%);
+  --muted-foreground: hsl(220 9% 60%);
 
-  --accent: hsl(223 13% 14%);
-  --accent-foreground: hsl(240 5% 96%);
+  --accent: hsl(225 13% 16%);
+  --accent-foreground: hsl(220 14% 96%);
 
-  --destructive: hsl(0 84% 62%);
+  --destructive: hsl(0 78% 62%);
   --destructive-foreground: hsl(0 0% 100%);
 
-  --success: hsl(160 84% 39%);
-  --success-foreground: hsl(0 0% 100%);
+  --success: hsl(156 68% 44%);
+  --success-foreground: hsl(160 90% 6%);
 
-  --warning: hsl(38 92% 50%);
-  --warning-foreground: hsl(20 14% 4%);
+  --warning: hsl(36 92% 56%);
+  --warning-foreground: hsl(30 40% 6%);
 
-  --border: hsl(223 11% 17%);
-  --input: hsl(223 11% 19%);
-  --ring: hsl(239 84% 67%);
+  /* 发丝级边框: 低对比, hover 时用 strong */
+  --border: hsl(225 12% 16%);
+  --border-strong: hsl(225 11% 24%);
+  --input: hsl(225 12% 18%);
+  --ring: hsl(240 82% 68%);
 
-  --code-bg: hsl(228 20% 5%);
-  --code-fg: hsl(214 32% 85%);
+  /* 顶部高光: 深色下用极淡白提亮上缘 */
+  --highlight: hsl(0 0% 100% / 0.06);
 
-  --chart-1: hsl(239 84% 67%);
-  --chart-2: hsl(160 84% 45%);
-  --chart-3: hsl(38 92% 55%);
-  --chart-4: hsl(199 89% 55%);
-  --chart-5: hsl(280 70% 68%);
+  --code-bg: hsl(225 22% 6%);
+  --code-fg: hsl(216 20% 82%);
 
-  --sidebar: hsl(228 16% 6%);
-  --sidebar-foreground: hsl(240 5% 96%);
-  --sidebar-border: hsl(223 11% 15%);
+  --chart-1: hsl(240 82% 68%);
+  --chart-2: hsl(156 68% 48%);
+  --chart-3: hsl(36 92% 58%);
+  --chart-4: hsl(199 85% 56%);
+  --chart-5: hsl(280 68% 70%);
+
+  --sidebar: hsl(225 20% 6%);
+  --sidebar-foreground: hsl(220 14% 96%);
+  --sidebar-border: hsl(225 12% 14%);
+  --sidebar-accent: hsl(225 14% 12%);
 }
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 3px);
+  --radius-md: calc(var(--radius) - 1px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-xl: calc(var(--radius) + 3px);
+  --radius-2xl: calc(var(--radius) + 7px);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-elevated: var(--elevated);
+  --color-elevated-foreground: var(--elevated-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
@@ -148,8 +167,10 @@
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-highlight: var(--highlight);
   --color-code-bg: var(--code-bg);
   --color-code-fg: var(--code-fg);
   --color-chart-1: var(--chart-1);
@@ -160,9 +181,10 @@
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
 
-  --font-sans: 'Fira Sans', -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'Fira Code', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-sans: var(--font-geist-sans), -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
 }
 
 @layer base {
@@ -177,28 +199,31 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+    font-size: 14px;
   }
 
   /* 数值/ID/代码统一等宽, 便于列对齐 */
   .tabular {
     font-variant-numeric: tabular-nums;
     font-family: var(--font-mono);
+    letter-spacing: 0;
   }
 
-  /* 自定义滚动条 */
+  /* 自定义滚动条 (更细, Linear 式) */
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    scrollbar-color: var(--border-strong) transparent;
   }
   *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
   }
   *::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: var(--border-strong);
     border-radius: 6px;
     border: 2px solid transparent;
     background-clip: content-box;
@@ -216,5 +241,20 @@
       transition-duration: 0.001ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+@layer components {
+  /* 顶部 1px 高光: 卡片/浮层上缘的精致提亮, Linear 招牌 */
+  .surface-highlight {
+    position: relative;
+  }
+  .surface-highlight::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--highlight), transparent);
+    pointer-events: none;
   }
 }

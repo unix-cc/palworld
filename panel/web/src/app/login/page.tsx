@@ -48,33 +48,45 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background px-4">
-      {/* 装饰背景 */}
+      {/* 装饰背景: 网格 + 双光晕 + 噪点 */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.4] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_35%,#000_40%,transparent_100%)]"
+        className="pointer-events-none absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_65%_55%_at_50%_30%,#000_35%,transparent_100%)]"
         style={{
           backgroundImage:
             'linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
+          backgroundSize: '44px 44px',
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[15%] h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-[10%] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-[5%] left-[20%] h-[320px] w-[320px] rounded-full bg-chart-5/10 blur-[100px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.18] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+        }}
       />
 
       <div className="relative w-full max-w-sm">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
+          <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-inset ring-primary/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
             <MonitorCog className="size-6" />
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight">幻兽帕鲁</h1>
-            <p className="text-sm text-muted-foreground">服务器管理面板</p>
+            <h1 className="text-lg font-semibold tracking-tight">幻兽帕鲁</h1>
+            <p className="text-[13px] text-muted-foreground">服务器管理面板</p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
+        <div className="surface-highlight rounded-2xl border border-border bg-card/80 p-6 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <div className="space-y-2">
               <Label htmlFor="username">用户名</Label>

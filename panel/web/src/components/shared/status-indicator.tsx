@@ -6,11 +6,11 @@ import { cn } from '@/lib/utils'
 
 export type StatusTone = 'running' | 'stopped' | 'pending' | 'unknown'
 
-const toneMap: Record<StatusTone, { dot: string; text: string; ring: string }> = {
-  running: { dot: 'bg-success', text: 'text-success', ring: 'bg-success/15' },
-  stopped: { dot: 'bg-destructive', text: 'text-destructive', ring: 'bg-destructive/15' },
-  pending: { dot: 'bg-warning', text: 'text-warning', ring: 'bg-warning/15' },
-  unknown: { dot: 'bg-muted-foreground', text: 'text-muted-foreground', ring: 'bg-muted' },
+const toneMap: Record<StatusTone, { dot: string; text: string; border: string }> = {
+  running: { dot: 'bg-success', text: 'text-success', border: 'border-success/25 bg-success/10' },
+  stopped: { dot: 'bg-destructive', text: 'text-destructive', border: 'border-destructive/25 bg-destructive/10' },
+  pending: { dot: 'bg-warning', text: 'text-warning', border: 'border-warning/25 bg-warning/10' },
+  unknown: { dot: 'bg-muted-foreground', text: 'text-muted-foreground', border: 'border-border bg-muted/40' },
 }
 
 interface StatusIndicatorProps {
@@ -26,7 +26,8 @@ export function StatusIndicator({ tone, label, pulse, className }: StatusIndicat
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium',
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        t.border,
         t.text,
         className,
       )}

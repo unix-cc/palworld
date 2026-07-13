@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { AuthGuard } from '@/components/layout/auth-guard'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { AppHeader } from '@/components/layout/app-header'
+import { CommandPalette } from '@/components/shared/command-palette'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -17,6 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <AuthGuard>
+      <CommandPalette />
       <div className="flex h-dvh overflow-hidden bg-background">
         <AppSidebar
           collapsed={collapsed}
