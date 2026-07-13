@@ -15,6 +15,8 @@ interface StatCardProps {
   tone?: 'default' | 'success' | 'warning' | 'destructive' | 'muted'
   /** 左侧强调条 (如运行中) */
   accent?: boolean
+  /** value 是否用等宽 (数字/ID 用 true; 中文文案用 false, 走正文字体) */
+  mono?: boolean
   className?: string
 }
 
@@ -41,6 +43,7 @@ export function StatCard({
   sub,
   tone = 'default',
   accent,
+  mono = true,
   className,
 }: StatCardProps) {
   return (
@@ -63,7 +66,8 @@ export function StatCard({
       </div>
       <div
         className={cn(
-          'mt-2.5 text-[26px] font-semibold leading-none tracking-tight tabular',
+          'mt-2.5 text-[26px] font-semibold leading-none tracking-tight',
+          mono && 'tabular',
           toneClass[tone],
         )}
       >

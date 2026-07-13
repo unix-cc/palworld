@@ -183,8 +183,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent: var(--sidebar-accent);
 
-  --font-sans: var(--font-geist-sans), -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* 拉丁走 Geist; 中文兜底 (PingFang/雅黑) 排在 Segoe UI 与通用族之前,
+     避免 Windows 把 CJK 回退到 NSimSun/SimSun */
+  --font-sans: var(--font-geist-sans), -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, 'SFMono-Regular', Menlo, 'PingFang SC', 'Microsoft YaHei', monospace;
 }
 
 @layer base {

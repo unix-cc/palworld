@@ -66,6 +66,7 @@ export default function DashboardPage() {
               tone={isRunning ? 'success' : 'muted'}
               accent={isRunning}
               icon={Activity}
+              mono={false}
             />
             <StatCard
               label="在线玩家"
@@ -140,7 +141,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center justify-between py-2.5">
                   <dt className="text-muted-foreground">运行时长</dt>
-                  <dd className="tabular">{uptimeText(metrics.uptime)}</dd>
+                  <dd>{uptimeText(metrics.uptime)}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-4 py-2.5">
                   <dt className="shrink-0 text-muted-foreground">世界 GUID</dt>
