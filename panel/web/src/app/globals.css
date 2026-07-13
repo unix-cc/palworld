@@ -1,0 +1,220 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* ============================================================================
+ * 幻兽帕鲁面板 · 设计系统 (Modern SaaS Admin / Dual Theme)
+ *
+ * 设计语言: Linear · Vercel · Stripe · Notion 取向的企业级控制台。
+ *   中性 slate/zinc 底色 · Indigo 主强调 (CTA/激活/焦点) · Emerald 语义状态 (运行/健康)
+ *   正文 Fira Sans, 数值·ID·代码 Fira Code (等宽, tabular-nums)。
+ *
+ * 令牌驱动: 所有颜色走语义 token (--background/--primary/...), 组件不写死 hex,
+ *   light/dark 两套值成对定义, 保证对比度与主题一致性。
+ * ========================================================================== */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+
+  --background: hsl(210 40% 98%);
+  --foreground: hsl(222 47% 11%);
+
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(222 47% 11%);
+
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(222 47% 11%);
+
+  /* Indigo 主强调 */
+  --primary: hsl(243 75% 59%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --secondary: hsl(210 40% 96%);
+  --secondary-foreground: hsl(222 47% 11%);
+
+  --muted: hsl(210 40% 96%);
+  --muted-foreground: hsl(215 16% 47%);
+
+  --accent: hsl(210 40% 96%);
+  --accent-foreground: hsl(222 47% 11%);
+
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  /* Emerald 语义状态 (运行/健康/成功) */
+  --success: hsl(160 84% 32%);
+  --success-foreground: hsl(0 0% 100%);
+
+  /* Amber 警告 */
+  --warning: hsl(35 92% 42%);
+  --warning-foreground: hsl(0 0% 100%);
+
+  --border: hsl(214 32% 91%);
+  --input: hsl(214 32% 91%);
+  --ring: hsl(243 75% 59%);
+
+  /* 代码/日志区 */
+  --code-bg: hsl(222 47% 11%);
+  --code-fg: hsl(214 32% 91%);
+
+  /* 图表色板 (可及, 非纯红/绿对) */
+  --chart-1: hsl(243 75% 59%);
+  --chart-2: hsl(160 84% 39%);
+  --chart-3: hsl(35 92% 50%);
+  --chart-4: hsl(199 89% 48%);
+  --chart-5: hsl(280 65% 60%);
+
+  --sidebar: hsl(0 0% 100%);
+  --sidebar-foreground: hsl(222 47% 11%);
+  --sidebar-border: hsl(214 32% 91%);
+}
+
+.dark {
+  --background: hsl(222 24% 4%);
+  --foreground: hsl(240 5% 96%);
+
+  --card: hsl(228 16% 7%);
+  --card-foreground: hsl(240 5% 96%);
+
+  --popover: hsl(228 16% 8%);
+  --popover-foreground: hsl(240 5% 96%);
+
+  /* Indigo 深色下略提亮以保对比 */
+  --primary: hsl(239 84% 67%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --secondary: hsl(228 12% 11%);
+  --secondary-foreground: hsl(240 5% 96%);
+
+  --muted: hsl(228 12% 11%);
+  --muted-foreground: hsl(218 9% 64%);
+
+  --accent: hsl(223 13% 14%);
+  --accent-foreground: hsl(240 5% 96%);
+
+  --destructive: hsl(0 84% 62%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --success: hsl(160 84% 39%);
+  --success-foreground: hsl(0 0% 100%);
+
+  --warning: hsl(38 92% 50%);
+  --warning-foreground: hsl(20 14% 4%);
+
+  --border: hsl(223 11% 17%);
+  --input: hsl(223 11% 19%);
+  --ring: hsl(239 84% 67%);
+
+  --code-bg: hsl(228 20% 5%);
+  --code-fg: hsl(214 32% 85%);
+
+  --chart-1: hsl(239 84% 67%);
+  --chart-2: hsl(160 84% 45%);
+  --chart-3: hsl(38 92% 55%);
+  --chart-4: hsl(199 89% 55%);
+  --chart-5: hsl(280 70% 68%);
+
+  --sidebar: hsl(228 16% 6%);
+  --sidebar-foreground: hsl(240 5% 96%);
+  --sidebar-border: hsl(223 11% 15%);
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --font-sans: 'Fira Sans', -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 数值/ID/代码统一等宽, 便于列对齐 */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+  }
+
+  /* 自定义滚动条 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+    background-clip: content-box;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

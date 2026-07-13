@@ -1,3 +1,8 @@
+# 新前端 (Next.js)
+web/node_modules
+web/.next
+web/out
+# 旧前端 (Vue, 已废弃, 仍在仓库中时避免误拷)
 frontend/node_modules
 frontend/dist
 backend/__pycache__

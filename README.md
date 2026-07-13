@@ -4,7 +4,7 @@
 面板基于官方 REST API，可远程管理服务器：启停、玩家、广播、存档备份、配置修改、定时任务。
 
 - **游戏服务端**：`cm2network/steamcmd` 轻量镜像 + entrypoint 自动装/更新/配置/启动
-- **管理面板**：FastAPI + Vue3，挂载 `docker.sock` 控制游戏容器
+- **管理面板**：FastAPI + Next.js，挂载 `docker.sock` 控制游戏容器
 - 目标游戏版本：v1.0.0.100427 及以上（已支持官方 REST API）
 - 部署环境：Linux + Docker
 
@@ -13,7 +13,7 @@
 ```
                        ┌─────────────────────────────┐
    浏览器  ── :8000 ──▶ │  palworld-panel (容器)       │
-                       │   FastAPI + 内置 Vue3 前端    │
+                       │   FastAPI + 内置 Next.js 前端 │
                        │   ├─ 挂载 docker.sock ────────┼─▶ 启停/重启游戏容器
                        │   ├─ 调 REST API :8212 ───────┼─▶ 玩家/指标/存档/广播
                        │   ├─ 读写 ./data (存档/备份)  │
@@ -116,7 +116,7 @@ cd panel/backend && pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000   # 需要能连到游戏容器的 REST/docker
 
 # 前端（另开终端，/api 自动代理到 8000）
-cd panel/frontend && npm install && npm run dev   # http://localhost:5173
+cd panel/web && npm install && npm run dev   # http://localhost:3000
 ```
 
 ## ⚠️ 安全提示
