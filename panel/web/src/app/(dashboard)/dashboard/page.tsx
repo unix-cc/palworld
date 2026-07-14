@@ -13,12 +13,13 @@ import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { useServerOverview, useServerStatus, useServerAction } from '@/features/server/hooks/use-server'
+import { deriveServerState, type ServerRunState } from '@/features/server/services/server-service'
 
-const STATUS_TEXT: Record<string, string> = {
+const RUN_STATE_TEXT: Record<ServerRunState, string> = {
   running: '运行中',
-  stopped: '已停止',
   starting: '启动中',
-  exited: '已退出',
+  stopped: '已停止',
+  unknown: '未知',
 }
 
 function pct(v: number | null | undefined): number {
@@ -41,12 +42,14 @@ function uptimeText(seconds: number | undefined): string {
 }
 
 export default function DashboardPage() {
-  const { data: status, isLoading: statusLoading } = useServerStatus()
+  const { data: status, isLoading: statusLoading, isError: statusError } = useServerStatus()
   const { data: overview, isLoading: overviewLoading } = useServerOverview()
   const action = useServerAction()
 
-  const isRunning = status?.status === 'running'
-  const statusText = status?.status ? STATUS_TEXT[status.status] ?? status.status : '未知'
+  const runState = deriveServerState(status?.status, overview?.online, statusError)
+  const containerUp = status?.status === 'running'
+  const isRunning = runState === 'running'
+  const statusText = RUN_STATE_TEXT[runState]
   const metrics = overview?.metrics ?? {}
   const info = overview?.info ?? {}
 
@@ -160,7 +163,7 @@ export default function DashboardPage() {
           <div className="flex flex-wrap gap-3">
             <Button
               variant="success"
-              disabled={isRunning || action.isPending}
+              disabled={containerUp || action.isPending}
               onClick={() => action.mutate('start')}
             >
               <Play /> 启动
@@ -181,7 +184,7 @@ export default function DashboardPage() {
             </Button>
             <ConfirmDialog
               trigger={
-                <Button variant="destructive" disabled={!isRunning || action.isPending}>
+                <Button variant="destructive" disabled={!containerUp || action.isPending}>
                   <Square /> 停止
                 </Button>
               }

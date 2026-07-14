@@ -10,7 +10,8 @@ import { Button } from '@/components/ui/button'
 import { StatusIndicator } from '@/components/shared/status-indicator'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { navItems } from '@/components/layout/sidebar-nav'
-import { useServerStatus } from '@/features/server/hooks/use-server'
+import { useServerStatus, useServerOverview } from '@/features/server/hooks/use-server'
+import { deriveServerState, type ServerRunState } from '@/features/server/services/server-service'
 import { useAuthStore } from '@/stores/auth-store'
 import {
   Tooltip,
@@ -18,18 +19,18 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 
-function statusTone(status: string | undefined, isError: boolean) {
-  if (isError || status === undefined) return 'unknown' as const
-  if (status === 'running') return 'running' as const
-  if (status === 'starting') return 'pending' as const
-  return 'stopped' as const
+const RUN_STATE_TONE: Record<ServerRunState, 'running' | 'stopped' | 'pending' | 'unknown'> = {
+  running: 'running',
+  starting: 'pending',
+  stopped: 'stopped',
+  unknown: 'unknown',
 }
 
-const STATUS_TEXT: Record<string, string> = {
+const RUN_STATE_TEXT: Record<ServerRunState, string> = {
   running: '运行中',
-  stopped: '已停止',
   starting: '启动中',
-  exited: '已退出',
+  stopped: '已停止',
+  unknown: '连接中',
 }
 
 export function AppHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) {
@@ -37,12 +38,14 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) 
   const router = useRouter()
   const logout = useAuthStore((s) => s.logout)
   const { data, isError } = useServerStatus()
+  const { data: overview } = useServerOverview()
 
   const active = navItems.find((n) => n.href === pathname)
   const pageTitle = active?.label ?? '幻兽帕鲁面板'
 
-  const tone = statusTone(data?.status, isError)
-  const text = data?.status ? STATUS_TEXT[data.status] ?? data.status : tone === 'unknown' ? '连接中' : ''
+  const runState = deriveServerState(data?.status, overview?.online, isError)
+  const tone = RUN_STATE_TONE[runState]
+  const text = RUN_STATE_TEXT[runState]
 
   function handleLogout() {
     logout()

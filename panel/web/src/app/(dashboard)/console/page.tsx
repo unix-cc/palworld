@@ -19,6 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAnnounce, useShutdown, useServerLogs } from '@/features/server/hooks/use-server'
+import { LogViewer } from '@/features/server/components/log-viewer'
 
 const announceSchema = z.object({
   message: z.string().min(1, '请输入广播内容').max(200, '内容过长'),
@@ -35,7 +36,7 @@ export default function ConsolePage() {
   const announce = useAnnounce()
   const shutdown = useShutdown()
   const { data: logs, isFetching, refetch } = useServerLogs()
-  const logRef = React.useRef<HTMLPreElement>(null)
+  const logRef = React.useRef<HTMLDivElement>(null)
 
   const announceForm = useForm<AnnounceForm>({
     resolver: zodResolver(announceSchema),
@@ -168,12 +169,7 @@ export default function ConsolePage() {
             </Button>
           </CardHeader>
           <CardContent>
-            <pre
-              ref={logRef}
-              className="h-[480px] overflow-auto rounded-md bg-code-bg p-3 font-mono text-xs leading-relaxed text-code-fg"
-            >
-              {logs || '暂无日志'}
-            </pre>
+            <LogViewer ref={logRef} text={logs} className="h-[480px]" />
           </CardContent>
         </Card>
       </div>
