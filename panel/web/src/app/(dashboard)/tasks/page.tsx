@@ -61,7 +61,6 @@ export default function TasksPage() {
         description="配置定时重启与定时备份。使用标准 5 段 crontab 表达式（分 时 日 月 周）。"
       />
 
-      {/* 添加任务 */}
       <Card className="p-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[180px_200px_1fr_auto] lg:items-end">
           <div className="space-y-1.5">
@@ -111,7 +110,6 @@ export default function TasksPage() {
         </div>
       </Card>
 
-      {/* 任务列表 */}
       <Card className="gap-0 overflow-hidden py-0">
         <div className="flex items-center gap-2 border-b border-border px-5 py-3 text-sm font-medium">
           已配置任务

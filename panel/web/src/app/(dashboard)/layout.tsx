@@ -28,7 +28,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex min-w-0 flex-1 flex-col">
           <AppHeader
             onToggleSidebar={() => {
-              // 桌面端切折叠, 移动端开抽屉
               if (window.matchMedia('(min-width: 768px)').matches) {
                 setCollapsed((c) => !c)
               } else {

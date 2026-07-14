@@ -46,7 +46,6 @@ export default function ConsolePage() {
     defaultValues: { seconds: 30, message: 'Server will shutdown soon.' },
   })
 
-  // 日志更新后滚到底部
   React.useEffect(() => {
     const el = logRef.current
     if (el) el.scrollTop = el.scrollHeight
@@ -66,7 +65,6 @@ export default function ConsolePage() {
       <PageHeader title="广播 / 控制" description="向全服玩家广播消息，或发起定时关服。" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        {/* 左侧: 广播 + 关服 */}
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
@@ -154,7 +152,6 @@ export default function ConsolePage() {
           </Card>
         </div>
 
-        {/* 右侧: 日志 */}
         <Card className="lg:col-span-3">
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="flex items-center gap-2">

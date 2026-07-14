@@ -1,4 +1,3 @@
-// ============================================================================
 // PalWorldSettings.ini 配置项元数据 (中文说明 + 类型 + 分类)
 //
 // 分类严格对齐官方文档的四个分组:
@@ -12,7 +11,6 @@
 // 覆盖, 故设为只读并给出提示。
 //
 // 注: RCON 在本项目已废弃, 面板与后台全程使用官方 REST API。
-// ============================================================================
 
 export type FieldType = 'bool' | 'int' | 'float' | 'text' | 'select'
 
@@ -49,7 +47,6 @@ export const CATEGORIES: Category[] = [
 ]
 
 export const SCHEMA: Record<string, FieldMeta> = {
-  // ------------------------------------------------------------------ 性能
   BaseCampMaxNum: {
     cat: 'performance', label: '全服据点总数上限', type: 'int',
     desc: '整个服务器允许存在的据点(基地)总数量。',
@@ -87,8 +84,38 @@ export const SCHEMA: Record<string, FieldMeta> = {
     desc: '帕鲁相对玩家的同步距离 (单位 cm)。最小 5000, 最大 15000。',
     min: 5000, max: 15000, step: 500,
   },
+  DropItemMaxNum: {
+    cat: 'performance', label: '世界掉落物最大数量', type: 'int',
+    desc: '地图上同时存在的掉落物最大数量, 超过后旧掉落物会被清除。',
+    note: '调高会增加处理负载。',
+    min: 0, max: 10000, step: 100,
+  },
+  DropItemMaxNum_UNKO: {
+    cat: 'performance', label: 'UNKO掉落物最大数量', type: 'int',
+    desc: '特殊排泄物 (UNKO) 掉落数量上限。',
+    min: 0, max: 10000, step: 100,
+  },
+  DropItemAliveMaxHours: {
+    cat: 'performance', label: '掉落物存在时间(时)', type: 'float',
+    desc: '地面掉落物多久后自动消失 (小时)。',
+    min: 0, max: 24, step: 0.5,
+  },
+  MaxGuildsPerFrame: {
+    cat: 'performance', label: '每帧最大公会处理数', type: 'int',
+    desc: '服务器每个游戏帧处理的公会数量限制, 用于优化性能。',
+    min: 1, max: 100, step: 1,
+  },
+  BuildingNameDisplayCacheTTLSeconds: {
+    cat: 'performance', label: '建筑名称显示缓存(秒)', type: 'int',
+    desc: '建筑名称显示缓存有效时间 (秒), 用于优化服务器性能。',
+    min: 0, max: 3600, step: 10,
+  },
+  PlayerDataPalStorageUpdateCheckTickInterval: {
+    cat: 'performance', label: '玩家帕鲁存储检查间隔', type: 'int',
+    desc: '检查玩家帕鲁存储数据更新的间隔时间 (帧/tick)。',
+    min: 1, max: 300, step: 1,
+  },
 
-  // -------------------------------------------------------------- 服务器管理
   ServerName: {
     cat: 'server', label: '服务器名称', type: 'text', managed: true,
     desc: '服务器显示名称。',
@@ -160,8 +187,53 @@ export const SCHEMA: Record<string, FieldMeta> = {
     cat: 'server', label: '日志格式', type: 'select', options: ['Text', 'Json'],
     desc: '服务器日志格式: Text 文本 或 Json。',
   },
+  AutoSaveSpan: {
+    cat: 'server', label: '自动保存间隔(秒)', type: 'float',
+    desc: '服务器自动保存世界数据的时间间隔 (秒)。',
+    min: 30, max: 1800, step: 30,
+  },
+  bIsMultiplay: {
+    cat: 'server', label: '多人模式', type: 'bool',
+    desc: '是否启用多人服务器模式。',
+  },
+  CoopPlayerMaxNum: {
+    cat: 'server', label: '联机玩家最大数量', type: 'int',
+    desc: '合作模式最大玩家数 (非服务器公会人数)。',
+    min: 1, max: 32, step: 1,
+  },
+  RCONEnabled: {
+    cat: 'server', label: '开启RCON远程管理', type: 'bool',
+    desc: '是否允许通过 RCON 工具远程管理服务器。',
+    note: '本项目使用官方 REST API, 不依赖 RCON。',
+  },
+  RCONPort: {
+    cat: 'server', label: 'RCON端口', type: 'int',
+    desc: 'RCON 连接端口, 默认 25575。',
+    min: 1, max: 65535, step: 1,
+  },
+  Region: {
+    cat: 'server', label: '地区', type: 'text',
+    desc: '服务器区域设置 (通常留空或自动)。',
+  },
+  bUseAuth: {
+    cat: 'server', label: '使用认证服务器', type: 'bool',
+    desc: '是否启用官方认证验证。',
+  },
+  BanListURL: {
+    cat: 'server', label: '封禁名单地址', type: 'text',
+    desc: '官方黑名单 / 封禁玩家列表 URL。',
+  },
+  AutoTransferMasterCheckIntervalSeconds: {
+    cat: 'server', label: '自动转移主机检查间隔(秒)', type: 'int',
+    desc: '检查服务器管理员 / 主机转移条件的周期 (秒)。',
+    min: 0, max: 86400, step: 60,
+  },
+  AutoTransferMasterThresholdDays: {
+    cat: 'server', label: '自动转移主机天数阈值', type: 'int',
+    desc: '主机玩家多少天未登录后触发自动转移。',
+    min: 0, max: 365, step: 1,
+  },
 
-  // ------------------------------------------------------------------ 玩法功能
   bIsPvP: {
     cat: 'features', label: '启用 PvP', type: 'bool',
     desc: '是否开启玩家对战 (PvP)。',
@@ -281,8 +353,35 @@ export const SCHEMA: Record<string, FieldMeta> = {
     cat: 'features', label: '野生帕鲁等级随机', type: 'bool',
     desc: '开启则野生帕鲁等级完全随机; 关闭则在各区域预设范围内随机。',
   },
+  bEnablePlayerToPlayerDamage: {
+    cat: 'features', label: '开启玩家对玩家伤害', type: 'bool',
+    desc: '是否允许玩家之间造成伤害 (PvP 伤害)。',
+  },
+  bEnableFriendlyFire: {
+    cat: 'features', label: '开启友军伤害', type: 'bool',
+    desc: '是否允许攻击队友 / 同公会成员。',
+  },
+  bEnableDefenseOtherGuildPlayer: {
+    cat: 'features', label: '开启防御其他公会玩家', type: 'bool',
+    desc: '是否允许建筑 / 防御设施攻击其他公会玩家。',
+  },
+  bEnableAimAssistPad: {
+    cat: 'features', label: '手柄瞄准辅助', type: 'bool',
+    desc: '是否开启手柄玩家的自动瞄准辅助。',
+  },
+  bEnableAimAssistKeyboard: {
+    cat: 'features', label: '键鼠瞄准辅助', type: 'bool',
+    desc: '是否开启键盘鼠标玩家的自动瞄准辅助。',
+  },
+  EnablePredatorBossPal: {
+    cat: 'features', label: '启用掠食者Boss帕鲁', type: 'bool',
+    desc: '是否生成新的掠食者 Boss 帕鲁。',
+  },
+  bActiveUNKO: {
+    cat: 'features', label: '启用UNKO系统', type: 'bool',
+    desc: '开启特殊娱乐内容 (与帕鲁排泄相关的彩蛋功能), 一般保持关闭。',
+  },
 
-  // ------------------------------------------------------------------ 游戏平衡
   ExpRate: {
     cat: 'balance', label: '经验倍率', type: 'float',
     desc: '经验值获取倍率。',
@@ -475,6 +574,28 @@ export const SCHEMA: Record<string, FieldMeta> = {
     cat: 'balance', label: 'PvP额外掉落数量', type: 'int',
     desc: '启用 PvP 额外掉落时, 掉落物品的数量。',
     min: 0, max: 100, step: 1,
+  },
+  Difficulty: {
+    cat: 'balance', label: '难度', type: 'select', options: ['None', 'Casual', 'Normal', 'Hard'],
+    desc: '游戏难度设置。None 表示自定义难度 (不使用预设难度)。',
+  },
+  WorkSpeedRate: {
+    cat: 'balance', label: '工作速度倍率', type: 'float',
+    desc: '帕鲁工作效率倍率, 影响采集、制作、发电、种植等工作速度。',
+    min: 0.1, max: 5, step: 0.1,
+  },
+  BuildObjectHpRate: {
+    cat: 'balance', label: '建筑物生命值倍率', type: 'float',
+    desc: '建筑物耐久倍率。例如 2.0 = 建筑血量翻倍。',
+    min: 0.5, max: 3, step: 0.1,
+  },
+  bCanPickupOtherGuildDeathPenaltyDrop: {
+    cat: 'balance', label: '可拾取其他公会死亡掉落', type: 'bool',
+    desc: '是否允许玩家拾取其他公会成员的死亡掉落物。',
+  },
+  bEnableNonLoginPenalty: {
+    cat: 'balance', label: '启用离线惩罚', type: 'bool',
+    desc: '是否开启玩家长时间不上线的惩罚机制。',
   },
 }
 

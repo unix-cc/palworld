@@ -16,7 +16,6 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col bg-sidebar">
-      {/* 品牌 */}
       <div className="flex h-14 items-center gap-2.5 px-4">
         <div className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
           <Gamepad2 className="size-[18px]" />
@@ -26,7 +25,6 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </span>
       </div>
 
-      {/* 导航 */}
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2.5 py-2" aria-label="主导航">
         {navItems.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -60,7 +58,6 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      {/* 底部版本 */}
       <div className="px-4 py-3">
         <span className="font-mono text-[11px] tracking-tight text-muted-foreground">
           Palworld Console · v1.0
@@ -87,7 +84,6 @@ interface AppSidebarProps {
 export function AppSidebar({ collapsed, mobileOpen, onMobileClose }: AppSidebarProps) {
   return (
     <>
-      {/* 桌面侧栏 */}
       <aside
         className={cn(
           'hidden shrink-0 border-r border-sidebar-border transition-[width] duration-200 md:block',
@@ -97,7 +93,6 @@ export function AppSidebar({ collapsed, mobileOpen, onMobileClose }: AppSidebarP
         <SidebarContent />
       </aside>
 
-      {/* 移动端抽屉 */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
           <div

@@ -54,7 +54,6 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <PageHeader title="仪表盘" description="服务器运行概览、资源占用与快捷控制。" />
 
-      {/* KPI 卡片 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {statusLoading ? (
           Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-[92px] rounded-xl" />)
@@ -90,7 +89,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* 资源占用 */}
         <Card>
           <CardHeader>
             <CardTitle>资源占用（容器）</CardTitle>
@@ -119,7 +117,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* 服务器信息 */}
         <Card>
           <CardHeader>
             <CardTitle>服务器信息</CardTitle>
@@ -155,7 +152,6 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* 控制 */}
       <Card>
         <CardHeader>
           <CardTitle>服务器控制</CardTitle>

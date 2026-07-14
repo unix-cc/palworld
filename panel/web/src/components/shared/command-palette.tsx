@@ -54,7 +54,6 @@ export function CommandPalette() {
   const action = useServerAction()
   const logout = useAuthStore((s) => s.logout)
 
-  // ⌘K / Ctrl+K 唤起
   React.useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) {

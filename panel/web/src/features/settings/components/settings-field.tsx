@@ -36,7 +36,6 @@ interface SettingsFieldProps {
 export function SettingsField({ fieldKey, meta, value, onChange }: SettingsFieldProps) {
   const disabled = !!meta.managed
   const isNumeric = meta.type === 'int' || meta.type === 'float'
-  // 有明确 min/max 的数值项 -> 滑块 + 数字框组合
   const hasRange = isNumeric && meta.min !== undefined && meta.max !== undefined
   const step = meta.step ?? (meta.type === 'float' ? 0.1 : 1)
 
@@ -48,7 +47,6 @@ export function SettingsField({ fieldKey, meta, value, onChange }: SettingsField
 
   return (
     <div className="grid grid-cols-1 gap-2 border-b border-border/60 py-4 last:border-0 md:grid-cols-[minmax(0,320px)_1fr] md:items-start md:gap-6">
-      {/* 标签列 */}
       <div className="space-y-1">
         <div className="flex items-center gap-1.5">
           <Label htmlFor={fieldKey} className="text-sm font-medium">
@@ -68,7 +66,6 @@ export function SettingsField({ fieldKey, meta, value, onChange }: SettingsField
         <code className="block font-mono text-xs text-muted-foreground/70">{fieldKey}</code>
       </div>
 
-      {/* 控件 + 说明列 */}
       <div className="space-y-1.5">
         <div className="flex flex-wrap items-center gap-2">
           {meta.type === 'bool' ? (

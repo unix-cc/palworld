@@ -73,7 +73,6 @@ export function AppHeader({ onToggleSidebar }: { onToggleSidebar: () => void }) 
       </div>
 
       <div className="flex items-center gap-1.5">
-        {/* ⌘K 命令面板入口 */}
         <button
           onClick={openPalette}
           className="hidden h-8 items-center gap-2 rounded-md border border-border bg-elevated/40 pl-2.5 pr-1.5 text-[13px] text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground sm:flex"

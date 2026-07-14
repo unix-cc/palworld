@@ -37,7 +37,6 @@ class PalAPI:
             return resp.json()
         return {"message": resp.text or "OK"}
 
-    # ---------------- GET ----------------
     async def info(self) -> dict:
         return await self._request("GET", "info")
 
@@ -50,7 +49,6 @@ class PalAPI:
     async def settings(self) -> dict:
         return await self._request("GET", "settings")
 
-    # ---------------- POST ----------------
     async def announce(self, message: str) -> dict:
         return await self._request("POST", "announce", json={"message": message})
 

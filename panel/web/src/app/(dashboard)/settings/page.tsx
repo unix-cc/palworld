@@ -41,7 +41,8 @@ interface OtherRow {
 }
 
 export default function SettingsPage() {
-  const { data, isLoading, isError, error, refetch, isFetching } = useIniSettings()
+  const { data, isLoading, isError, error, refetch, isFetching, dataUpdatedAt } =
+    useIniSettings()
   const updateIni = useUpdateIni()
   const serverAction = useServerAction()
 
@@ -54,7 +55,6 @@ export default function SettingsPage() {
   const [others, setOthers] = React.useState<OtherRow[]>([])
   const [tab, setTab] = React.useState<string>('performance')
 
-  // 数据到达后填充本地编辑态
   React.useEffect(() => {
     if (!data) return
     const next: Record<CategoryKey, KnownRow[]> = {
@@ -74,7 +74,10 @@ export default function SettingsPage() {
     }
     setGrouped(next)
     setOthers(otherRows)
-  }, [data])
+    // 依赖 dataUpdatedAt 而非 data: React Query 结构共享会在内容不变时复用同一引用,
+    // 只用 [data] 时「重新读取」到相同内容不会重跑本 effect, 表单便不会重置回服务器值。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataUpdatedAt])
 
   function setKnownValue(cat: CategoryKey, key: string, value: FieldValue) {
     setGrouped((prev) => ({
@@ -226,7 +229,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* 保存栏 */}
       <div className="sticky bottom-0 flex flex-wrap gap-3 border-t border-border bg-background/70 py-4 backdrop-blur-xl">
         <Button onClick={handleSave} disabled={saving || isLoading}>
           <Save />

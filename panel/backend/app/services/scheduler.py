@@ -19,7 +19,6 @@ scheduler = AsyncIOScheduler(timezone="Asia/Shanghai")
 _STORE = Path(settings.pal_data_dir).parent / "panel_jobs.json"
 
 
-# ---------------- 任务动作 ----------------
 async def _job_restart() -> None:
     try:
         await pal_api.save()
@@ -40,7 +39,6 @@ async def _job_backup() -> None:
 ACTIONS = {"restart": _job_restart, "backup": _job_backup}
 
 
-# ---------------- 持久化 ----------------
 def _load() -> list[dict]:
     if _STORE.exists():
         try:
@@ -55,7 +53,6 @@ def _save(jobs: list[dict]) -> None:
     _STORE.write_text(json.dumps(jobs, ensure_ascii=False, indent=2), "utf-8")
 
 
-# ---------------- 对外 API ----------------
 def list_jobs() -> list[dict[str, Any]]:
     out = []
     for j in scheduler.get_jobs():

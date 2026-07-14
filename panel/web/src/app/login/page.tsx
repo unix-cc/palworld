@@ -48,7 +48,6 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background px-4">
-      {/* 装饰背景: 网格 + 双光晕 + 噪点 */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_65%_55%_at_50%_30%,#000_35%,transparent_100%)]"

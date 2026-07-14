@@ -36,7 +36,7 @@
 ## 🚀 部署（Linux + Docker）
 
 ```bash
-git clone <this-repo> && cd palworld
+git clone https://github.com/unix-cc/palworld-server.git && cd palworld
 
 # 1. 配置 (两个文件)
 cp .env.example .env                       # 部署/面板: PANEL_PASSWORD / JWT_SECRET / REGISTRY_MIRROR
