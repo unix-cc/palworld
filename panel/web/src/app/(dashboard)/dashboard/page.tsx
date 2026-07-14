@@ -27,6 +27,12 @@ function pct(v: number | null | undefined): number {
   return Math.min(100, Math.round(v))
 }
 
+/** MB -> GB, 保留一位小数 (宿主机内存量级用 GB 更直观)。 */
+function gb(mb: number | null | undefined): string {
+  if (mb == null) return '-'
+  return (mb / 1024).toFixed(1)
+}
+
 function fpsTone(fps: number | undefined): 'success' | 'warning' | 'destructive' | 'muted' {
   if (fps == null) return 'muted'
   if (fps >= 50) return 'success'
@@ -94,7 +100,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>资源占用（容器）</CardTitle>
+            <CardTitle>资源占用（宿主机）</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-2">
@@ -112,7 +118,7 @@ export default function DashboardPage() {
                   <MemoryStick className="size-4" /> 内存
                 </span>
                 <span className="tabular text-muted-foreground">
-                  {status?.mem_used_mb ?? '-'} / {status?.mem_limit_mb ?? '-'} MB
+                  {gb(status?.mem_used_mb)} / {gb(status?.mem_limit_mb)} GB
                 </span>
               </div>
               <Progress value={pct(status?.mem_percent)} />

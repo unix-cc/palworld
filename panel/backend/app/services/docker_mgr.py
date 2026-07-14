@@ -33,16 +33,9 @@ class DockerManager:
             ) from exc
 
     def status(self) -> dict[str, Any]:
-        """容器状态 + CPU/内存 占用 (单次采样)。"""
+        """容器运行状态 (running/exited/...)。资源占用由宿主机采样单独提供。"""
         c = self._container()
-        info: dict[str, Any] = {"name": c.name, "status": c.status, "id": c.short_id}
-        if c.status == "running":
-            try:
-                stats = c.stats(stream=False)
-                info.update(_parse_stats(stats))
-            except Exception:  # noqa: BLE001
-                pass
-        return info
+        return {"name": c.name, "status": c.status, "id": c.short_id}
 
     def start(self) -> None:
         self._container().start()
@@ -55,35 +48,6 @@ class DockerManager:
 
     def logs(self, tail: int = 200) -> str:
         return self._container().logs(tail=tail).decode("utf-8", errors="replace")
-
-
-def _parse_stats(stats: dict) -> dict[str, Any]:
-    """从 docker stats 原始数据算出 CPU% 与内存占用。"""
-    out: dict[str, Any] = {}
-    try:
-        cpu = stats["cpu_stats"]
-        pre = stats["precpu_stats"]
-        cpu_delta = cpu["cpu_usage"]["total_usage"] - pre["cpu_usage"]["total_usage"]
-        sys_delta = cpu["system_cpu_usage"] - pre["system_cpu_usage"]
-        ncpu = cpu.get("online_cpus") or len(
-            cpu["cpu_usage"].get("percpu_usage") or [1]
-        )
-        if sys_delta > 0 and cpu_delta > 0:
-            out["cpu_percent"] = round(cpu_delta / sys_delta * ncpu * 100, 2)
-    except (KeyError, TypeError):
-        out["cpu_percent"] = None
-
-    try:
-        mem = stats["memory_stats"]
-        used = mem["usage"] - mem.get("stats", {}).get("cache", 0)
-        limit = mem["limit"]
-        out["mem_used_mb"] = round(used / 1024 / 1024, 1)
-        out["mem_limit_mb"] = round(limit / 1024 / 1024, 1)
-        out["mem_percent"] = round(used / limit * 100, 2) if limit else None
-    except (KeyError, TypeError):
-        out["mem_used_mb"] = None
-
-    return out
 
 
 docker_mgr = DockerManager()

@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from ..auth import get_current_user
+from ..services import host_metrics
 from ..services.docker_mgr import DockerManagerError, docker_mgr
 from ..services.pal_api import PalApiError, pal_api
 
@@ -20,11 +21,13 @@ class ShutdownIn(BaseModel):
 
 @router.get("/status")
 def status():
-    """容器状态 + 资源占用 (来自 docker)。"""
+    """容器运行状态 (来自 docker) + 宿主机资源占用 (CPU/内存)。"""
     try:
-        return docker_mgr.status()
+        data = docker_mgr.status()
     except DockerManagerError as e:
         raise HTTPException(status_code=503, detail=str(e))
+    data.update(host_metrics.sample())
+    return data
 
 
 @router.get("/overview")
